@@ -92,6 +92,7 @@
 
 		var zips = [];
 		var statecoordinates=[];
+		var zipsObject = {};
 
 		function dataPoints(zipData, stateData, farmData){
 			var points = [];
@@ -100,6 +101,7 @@
 				var coordinates=[d.Longitude, d.Latitude];
 				var zip={Zipcode: d.Zipcode, Coordinates: coordinates};
 				zips.push(zip);
+				zipsObject[d.Zipcode] = coordinates;
 			});
 			
 			stateData.forEach(function(d){
@@ -115,15 +117,13 @@
 					data.AddressZip=data.AddressZip.substring(0, data.AddressZip.indexOf("-"));
 				}
 
-				// var farmCoordinates=zips.find(function(d){
-				// 	return d.Zipcode==data.AddressZip;
-				// });
+				var farmCoordinates = getZipCoordinate(data.AddressZip);
 
 				var point={CertifierName: data.CertifierName, OperationID: data.OperationID, OperationName: data.OperationName, CertificationStatus: data.CertificationStatus,
 					DateOfStatus: data.DateOfStatus, CertifiedCrops: data.CertifiedCrops, AdditionalCrops: data.AdditionalCrops, CertifiedLivestock: data.CertifiedLivestock,
 					AdditionalLivestock: data.AdditionalLivestock, CertifiedWildCrops: data.CertifiedWildCrops, AdditionalWildCrops: data.AdditionalWildCrops,
 					CertifiedHandling: data.CertifiedHandling, AdditionalHandling: data.AdditionalHandling, AddressCity: data.AddressCity, AddressState: data.AddressState,
-					AddressZip: data.AddressZip, Phone: data.Phone, Email: data.Email};
+					AddressZip: data.AddressZip, Coordinates: farmCoordinates, Phone: data.Phone, Email: data.Email};
 
 				points.push(point);
 
@@ -133,6 +133,21 @@
 
 			return points;
 		}
+
+		function getZipCoordinate(zipCode) {
+			return zipsObject[zipCode];
+		}
+
+		// function findZipCoordinates(zips, zipcode){
+		// 	var coordinates=[];
+		// 	zips.some(function(d){
+		// 		if(d.Zipcode==zipcode){
+		// 			coordinates.push(d.Coordinates);
+		// 			return true;
+		// 		}else return false;
+		// 	});
+		// 	return coordinates;
+		// }
 
 		function showFarmsByState(farms, stateData, states){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
@@ -172,7 +187,7 @@
 			.attr("cx", function(d){return USprojection(d.Coordinates)[0];})
 			.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
 			.attr("r", function(d){return farmCountScale(d.FarmCount);})
-			.attr("opacity", 0.7)
+			.style("opacity", 0.7)
 			.style("fill", "red")
 			.on("mouseover", function(d){
 				this.setAttribute("opacity", 1.0);
