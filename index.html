@@ -42,6 +42,7 @@
 		var parseTopTen = function(line) {
 			return{
 				State: line["State"]
+				//for Dana: add FIPS column
 			}
 		}
 
@@ -77,6 +78,7 @@
 			}
 		}
 
+		var FIPSdata;
 
 		d3.queue()
 		.defer(d3.json, "us.json")
@@ -87,6 +89,11 @@
 		.await(function(error, USMapData, zipData, farmData, stateData, topTenData){
 
 			states=topojson.feature(USMapData, USMapData.objects.states);
+
+			//For Dana: this would only work when u add the FIPS column
+			FIPSdata = d3.map(topTenData, function (d) {
+				return d.FIPS;
+			});
 
 			zipData = zipData;
 			farmData = farmData;
@@ -218,7 +225,16 @@
 			var paths=svg.selectAll("path.country").data(topTenData);
 			paths.enter().append("path").attr("class","state")
 			.merge(paths)
-			.style("fill", "#7FA2CC");d
+			// .style("fill", "#7FA2CC");
+			.style("fill", function (states) {
+				//for Dana: 
+				var stateData=FIPSdata.get(states.id);
+				if (stateData) {
+					//return the color you want; can make it a scale
+					//example: var color = d3.scaleQuantize().domain(ownershipExtent).range([*colors*]);
+					//return color(Number(stateData.Ownership));
+				}
+			});
 
 			// stateData.forEach(function(d){
 			// 	console.log(d.State)
