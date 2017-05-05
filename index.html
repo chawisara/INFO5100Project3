@@ -41,8 +41,8 @@
 
 		var parseTopTen = function(line) {
 			return{
-				State: line["State"]
-				//for Dana: add FIPS column
+				State: line["State"], 
+				FIPS: Number(line["FIPS"])
 			}
 		}
 
@@ -90,8 +90,7 @@
 
 			states=topojson.feature(USMapData, USMapData.objects.states);
 
-			//For Dana: this would only work when u add the FIPS column
-			FIPSdata = d3.map(topTenData, function (d) {
+			FIPSdata = d3.map(topTenData, function(d) {
 				return d.FIPS;
 			});
 
@@ -219,63 +218,25 @@
 			});
 
 		}
-		//var topData = ["California","Texas","Washington","Pennsylvania","Oregon","Wisconsin", "Texas", "New York", "Colorado", "Michigan", "Iowa"]
 		function showtopTen(topTenData){
-			
 			var paths=svg.selectAll("path.country").data(topTenData);
 			paths.enter().append("path").attr("class","state")
 			.merge(paths)
-			// .style("fill", "#7FA2CC");
 			.style("fill", function (states) {
 				//for Dana: 
-				var stateData=FIPSdata.get(states.id);
+				var stateData=FIPSdata.get(states.FIPS);
+				console.log(stateData)
+				console.log(states.FIPS)
 				if (stateData) {
+					//console.log(stateData)
+					//var color = d3.scaleQuantize().domain(ownershipExtent).range(["#3566CC"]);
+					//return scale(stateData[variable]);
 					//return the color you want; can make it a scale
 					//example: var color = d3.scaleQuantize().domain(ownershipExtent).range([*colors*]);
-					//return color(Number(stateData.Ownership));
+					return "#3566CC"
+					//color(Number(stateData.Ownership));
 				}
 			});
-
-			// stateData.forEach(function(d){
-			// 	console.log(d.State)
-			// });
-			// color = ["#7FA2CC"];
-
-			// stateData.forEach(function(d){
-				// if (stateData.State == "California") {
-				// 	console.log("right")
-				// }
-			// });
-
-			//|| "Texas" || "Washington" || "Pennsylvania" || "Oregon" || "Wisconsin" || "Texas" || "New York" || "Colorado" || "Michigan" || "Iowa"
-			// console.log(stateData.State)
-			
-				
-			// 	console.log(topData);
-
-			// var paths=svg.selectAll("path.country").data(topData);
-			// paths.enter().append("path").attr("class","country")
-			// .merge(paths)
-			// .style("fill", "#7FA2CC");
-
-			// .attr("d", function(state){
-			// 	console.log(state.State)
-			// 	// if(country.State==(California || Texas || Washington || Pennsylvania || Oregon || Wisconsin || Texas || New York || Colorado || Michigan  || Iowa)){
-			// 	return USpathGenerator()
-			// 	// };
-			// });
-
-			
-
-		// 	// var paths = svg.selectAll("path.country").data(counties.features);
-		// 	// paths.enter().append("path").attr("class", "country")
-		// 	// .on("click", function (d) { console.log(d.id); })
-		// 	// .merge(paths)
-		// 	// .transition().duration(1000)
-		// 	// .style("fill", "blue")
-		// 	// .attr("d", function (county) {
-		// 	// 	return pathGenerator(county);
-		// 	// });
 		}
 
 	</script>
