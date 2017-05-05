@@ -27,11 +27,128 @@
 		var USpathGenerator = d3.geoPath().projection(USprojection);
 		var states;
 
-		d3.json("us.json", function(USMapData){
+		var zipData, farmData, stateData, USMapData;
+
+		var parseRowZip = function(line) {
+			return{
+				Zipcode: line["Zipcode"],
+				City: line["City"],
+				State: line["State"],
+				Latitude: Number(line["Lat"]),
+				Longitude: Number(line["Long"])
+			}
+		}
+
+		var parseRowFarms = function(line) {
+			return{
+				CertifierName: line["Certifier Name"],
+				OperationID: line["Operation ID"],
+				OperationName: line["Operation Name"],
+				CertificationStatus: line["Operation Certification Status"],
+				DateOfStatus: line["Effective Date of Operation Status"],
+				CertifiedCrops: line["Certified Products Under CROPS Scope"],
+				AdditionalCrops: line["Additional Certified Products Under CROPS Scope"],
+				CertifiedLivestock: line["Certified Products Under LIVESTOCK Scope"],
+				AdditionalLivestock: line["Additional Certified Products Under LIVESTOCK Scope"],
+				CertifiedWildCrops: line["Certified Products Under WILD CROPS Scope"],
+				AdditionalWildCrops: line["Additional Certified Products Under WILD CROPS Scope"],
+				CertifiedHandling: line["Certified Products Under HANDLING Scope"],
+				AdditionalHandling: line["Additional Certified Products Under HANDLING Scope"],
+				AddressCity: line["Physical Address: City"],
+				AddressState: line["Physical Address: State/Province"],
+				AddressZip: line["Physical Address: ZIP/ Postal Code"],
+				Phone: line["Phone"],
+				Email: line["Email"]
+				
+			}
+		}
+
+		var parseRowStateCoordinates = function(line){
+			return{
+				State: line["State"],
+				Latitude: Number(line["Latitude"]),
+				Longitude: Number(line["Longitude"])
+			}
+		}
+
+
+		d3.queue()
+		.defer(d3.json, "us.json")
+		.defer(d3.csv, "zipcode.csv", parseRowZip)
+		.defer(d3.csv, "organicfarms.csv", parseRowFarms)
+		.defer(d3.csv, "statecoordinates.csv", parseRowStateCoordinates)
+		.await(function(error, USMapData, zipData, farmData, stateData){
 
 			states=topojson.feature(USMapData, USMapData.objects.states);
 
+			zipData = zipData;
+			farmData = farmData;
+			stateData = stateData;
+
+			var farms=dataPoints(zipData, stateData, farmData);
+
+			showFarmsByState(farms, stateData, states);
+		});
+
+		var zips = [];
+		var statecoordinates=[];
+
+		function dataPoints(zipData, stateData, farmData){
+			var points = [];
+
+			zipData.forEach(function(d){
+				var coordinates=[d.Longitude, d.Latitude];
+				var zip={Zipcode: d.Zipcode, Coordinates: coordinates};
+				zips.push(zip);
+			});
+			
+			stateData.forEach(function(d){
+				var coordinates=[d.Longitude, d.Latitude];
+				var state={State: d.State, Coordinates: coordinates, FarmCount: 0};
+				statecoordinates.push(state);
+			});
+
+			farmData.forEach(function(data){
+				var zipCoordinates, farmCoordinates;
+
+				if(data.AddressZip.indexOf("-")!=-1){
+					data.AddressZip=data.AddressZip.substring(0, data.AddressZip.indexOf("-"));
+				}
+
+				zipCoordinates=zips[data.AddressZip];
+				if(zipCoordinates==undefined){
+					farmCoordinates=findZipCoordinates(zips, data.AddressZip);
+					// console.log(farmCoordinates);
+				}else{
+					farmCoordinates=zipCoordinates.Coordinates;
+				}
+
+				var point={CertifierName: data.CertifierName, OperationID: data.OperationID, OperationName: data.OperationName, CertificationStatus: data.CertificationStatus,
+					DateOfStatus: data.DateOfStatus, CertifiedCrops: data.CertifiedCrops, AdditionalCrops: data.AdditionalCrops, CertifiedLivestock: data.CertifiedLivestock,
+					AdditionalLivestock: data.AdditionalLivestock, CertifiedWildCrops: data.CertifiedWildCrops, AdditionalWildCrops: data.AdditionalWildCrops,
+					CertifiedHandling: data.CertifiedHandling, AdditionalHandling: data.AdditionalHandling, AddressCity: data.AddressCity, AddressState: data.AddressState,
+					AddressZip: data.AddressZip, Coordinates: farmCoordinates, Phone: data.Phone, Email: data.Email};
+
+				points.push(point);
+
+			});
+
+			// console.log(points);
+
+			return points;
+		}
+
+		function findZipCoordinates(zips, zipcode){
+			zips.forEach(function(d){
+				if(d.Zipcode==zipcode){
+					return d.Coordinates;
+				}
+			});
+		}
+
+		function showFarmsByState(farms, stateData, states){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
+
 
 			var paths=svg.selectAll("path.country").data(states.features);
 			paths.enter().append("path").attr("class","country")
@@ -40,7 +157,45 @@
 				return USpathGenerator(country);
 			});
 
-		});
+
+
+			var max=0;
+
+			statecoordinates.forEach(function(state){
+				var count=0;
+
+				farms.forEach(function(farm){
+					if(state.State==farm.AddressState){
+						count++;
+					}
+				});
+
+				state.FarmCount=Math.sqrt(count);
+				if(max<count) max=Math.sqrt(count);
+			});
+
+			var farmCountExtent = d3.extent(statecoordinates, function (d) { return d.FarmCount; });
+			var farmCountScale = d3.scaleLinear().domain(farmCountExtent).range([0,20]);
+
+			svg.selectAll("circle")
+			.data(statecoordinates)
+			.enter().append("circle")
+			.attr("id", function(d){return d.State;})
+			.attr("cx", function(d){return USprojection(d.Coordinates)[0];})
+			.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
+			.attr("r", function(d){return farmCountScale(d.FarmCount);})
+			.style("opacity", 0.7)
+			.style("fill", "red")
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 1.0);
+				// this.setAttribute("cursor", "pointer");
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0.7);
+				// this.setAttribute("cursor", "default");
+			});
+
+		}
 
 	</script>
 </body>
