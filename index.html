@@ -27,7 +27,7 @@
 		var USpathGenerator = d3.geoPath().projection(USprojection);
 		var states;
 
-		var zipData, farmData, stateData, USMapData;
+		var zipData, farmData, stateData, topTenData, USMapData;
 
 		var parseRowZip = function(line) {
 			return{
@@ -36,6 +36,12 @@
 				State: line["State"],
 				Latitude: Number(line["Lat"]),
 				Longitude: Number(line["Long"])
+			}
+		}
+
+		var parseTopTen = function(line) {
+			return{
+				State: line["State"]
 			}
 		}
 
@@ -77,23 +83,30 @@
 		.defer(d3.csv, "zipcode.csv", parseRowZip)
 		.defer(d3.csv, "organicfarms.csv", parseRowFarms)
 		.defer(d3.csv, "statecoordinates.csv", parseRowStateCoordinates)
-		.await(function(error, USMapData, zipData, farmData, stateData){
+		.defer(d3.csv, "toptenorganic.csv", parseTopTen)
+		.await(function(error, USMapData, zipData, farmData, stateData, topTenData){
 
 			states=topojson.feature(USMapData, USMapData.objects.states);
 
 			zipData = zipData;
 			farmData = farmData;
 			stateData = stateData;
+			topTenData = topTenData;
 
 			var farms=dataPoints(zipData, stateData, farmData);
 
 			showFarmsByState(farms, stateData, states);
+
+			showtopTen(topTenData);
+
+
+			
 		});
 
 		var zips = [];
 		var statecoordinates=[];
 		var zipsObject = {};
-
+		
 		function dataPoints(zipData, stateData, farmData){
 			var points = [];
 
@@ -198,6 +211,55 @@
 				// this.setAttribute("cursor", "default");
 			});
 
+		}
+		//var topData = ["California","Texas","Washington","Pennsylvania","Oregon","Wisconsin", "Texas", "New York", "Colorado", "Michigan", "Iowa"]
+		function showtopTen(topTenData){
+			
+			var paths=svg.selectAll("path.country").data(topTenData);
+			paths.enter().append("path").attr("class","state")
+			.merge(paths)
+			.style("fill", "#7FA2CC");d
+
+			// stateData.forEach(function(d){
+			// 	console.log(d.State)
+			// });
+			// color = ["#7FA2CC"];
+
+			// stateData.forEach(function(d){
+				// if (stateData.State == "California") {
+				// 	console.log("right")
+				// }
+			// });
+
+			//|| "Texas" || "Washington" || "Pennsylvania" || "Oregon" || "Wisconsin" || "Texas" || "New York" || "Colorado" || "Michigan" || "Iowa"
+			// console.log(stateData.State)
+			
+				
+			// 	console.log(topData);
+
+			// var paths=svg.selectAll("path.country").data(topData);
+			// paths.enter().append("path").attr("class","country")
+			// .merge(paths)
+			// .style("fill", "#7FA2CC");
+
+			// .attr("d", function(state){
+			// 	console.log(state.State)
+			// 	// if(country.State==(California || Texas || Washington || Pennsylvania || Oregon || Wisconsin || Texas || New York || Colorado || Michigan  || Iowa)){
+			// 	return USpathGenerator()
+			// 	// };
+			// });
+
+			
+
+		// 	// var paths = svg.selectAll("path.country").data(counties.features);
+		// 	// paths.enter().append("path").attr("class", "country")
+		// 	// .on("click", function (d) { console.log(d.id); })
+		// 	// .merge(paths)
+		// 	// .transition().duration(1000)
+		// 	// .style("fill", "blue")
+		// 	// .attr("d", function (county) {
+		// 	// 	return pathGenerator(county);
+		// 	// });
 		}
 
 	</script>
