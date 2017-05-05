@@ -109,41 +109,29 @@
 			});
 
 			farmData.forEach(function(data){
-				var zipCoordinates, farmCoordinates;
+				var zipCoordinates;
 
 				if(data.AddressZip.indexOf("-")!=-1){
 					data.AddressZip=data.AddressZip.substring(0, data.AddressZip.indexOf("-"));
 				}
 
-				zipCoordinates=zips[data.AddressZip];
-				if(zipCoordinates==undefined){
-					farmCoordinates=findZipCoordinates(zips, data.AddressZip);
-					// console.log(farmCoordinates);
-				}else{
-					farmCoordinates=zipCoordinates.Coordinates;
-				}
+				// var farmCoordinates=zips.find(function(d){
+				// 	return d.Zipcode==data.AddressZip;
+				// });
 
 				var point={CertifierName: data.CertifierName, OperationID: data.OperationID, OperationName: data.OperationName, CertificationStatus: data.CertificationStatus,
 					DateOfStatus: data.DateOfStatus, CertifiedCrops: data.CertifiedCrops, AdditionalCrops: data.AdditionalCrops, CertifiedLivestock: data.CertifiedLivestock,
 					AdditionalLivestock: data.AdditionalLivestock, CertifiedWildCrops: data.CertifiedWildCrops, AdditionalWildCrops: data.AdditionalWildCrops,
 					CertifiedHandling: data.CertifiedHandling, AdditionalHandling: data.AdditionalHandling, AddressCity: data.AddressCity, AddressState: data.AddressState,
-					AddressZip: data.AddressZip, Coordinates: farmCoordinates, Phone: data.Phone, Email: data.Email};
+					AddressZip: data.AddressZip, Phone: data.Phone, Email: data.Email};
 
 				points.push(point);
 
 			});
 
-			// console.log(points);
+			console.log(points);
 
 			return points;
-		}
-
-		function findZipCoordinates(zips, zipcode){
-			zips.forEach(function(d){
-				if(d.Zipcode==zipcode){
-					return d.Coordinates;
-				}
-			});
 		}
 
 		function showFarmsByState(farms, stateData, states){
