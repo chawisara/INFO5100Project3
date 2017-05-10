@@ -5,9 +5,9 @@
 <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 <style>
-	body { font-family: "Muli", sans-serif;}
+	body { font-family: "Muli", sans-serif; background-color: black;}
 	/*svg {border: solid #ccc 1px; }*/
-	path { fill: #ccc; stroke: white; stroke-width: 1px;}
+	path { fill: #151515; stroke: white; stroke-width: 1px;}
 </style>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -115,7 +115,7 @@
 			
 		});
 
-		var zips = [];
+		// var zips = [];
 		var statecoordinates=[];
 		var zipsObject = {};
 		
@@ -124,8 +124,8 @@
 
 			zipData.forEach(function(d){
 				var coordinates=[d.Longitude, d.Latitude];
-				var zip={Zipcode: d.Zipcode, Coordinates: coordinates};
-				zips.push(zip);
+				// var zip={Zipcode: d.Zipcode, Coordinates: coordinates};
+				// zips.push(zip);
 				zipsObject[d.Zipcode] = coordinates;
 			});
 			
@@ -143,14 +143,15 @@
 				}
 
 				var farmCoordinates = getZipCoordinate(data.AddressZip);
-
-				var point={CertifierName: data.CertifierName, OperationID: data.OperationID, OperationName: data.OperationName, CertificationStatus: data.CertificationStatus,
+				if(farmCoordinates!=undefined){
+					var point={CertifierName: data.CertifierName, OperationID: data.OperationID, OperationName: data.OperationName, CertificationStatus: data.CertificationStatus,
 					DateOfStatus: data.DateOfStatus, CertifiedCrops: data.CertifiedCrops, AdditionalCrops: data.AdditionalCrops, CertifiedLivestock: data.CertifiedLivestock,
 					AdditionalLivestock: data.AdditionalLivestock, CertifiedWildCrops: data.CertifiedWildCrops, AdditionalWildCrops: data.AdditionalWildCrops,
 					CertifiedHandling: data.CertifiedHandling, AdditionalHandling: data.AdditionalHandling, AddressCity: data.AddressCity, AddressState: data.AddressState,
 					AddressZip: data.AddressZip, Coordinates: farmCoordinates, Phone: data.Phone, Email: data.Email};
 
-				points.push(point);
+					points.push(point);
+				}
 
 			});
 
@@ -172,8 +173,6 @@
 				return USpathGenerator(country);
 			});
 
-
-
 			var max=0;
 
 			statecoordinates.forEach(function(state){
@@ -185,22 +184,20 @@
 					}
 				});
 
-				state.FarmCount=Math.sqrt(count);
-				if(max<count) max=Math.sqrt(count);
+				state.FarmCount=count;
+				if(max<count) max=count;
+
 			});
 
-			var farmCountExtent = d3.extent(statecoordinates, function (d) { return d.FarmCount; });
-			var farmCountScale = d3.scaleLinear().domain(farmCountExtent).range([0,20]);
-
 			svg.selectAll("circle")
-			.data(statecoordinates)
+			.data(farms)
 			.enter().append("circle")
-			.attr("id", function(d){return d.State;})
-			.attr("cx", function(d){return USprojection(d.Coordinates)[0];})
+			.attr("id", function(d){return d.OperationName;})
+			.attr("cx", function(d){console.log(d.AddressZip+" "+d.Coordinates); return USprojection(d.Coordinates)[0];})
 			.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
-			.attr("r", function(d){return farmCountScale(d.FarmCount);})
-			.attr("opacity", 0.7)
-			.style("fill", "red")
+			.attr("r", 3)
+			.attr("opacity", 0.5)
+			.style("fill", "white")
 			.on("mouseover", function(d){
 				this.setAttribute("opacity", 1.0);
 				// this.setAttribute("cursor", "pointer");
@@ -220,7 +217,7 @@
 				if (toptenFIPS.indexOf(states.id)>-1) {
 					return "#3566CC";
 				}else{
-					return "#ccc";
+					return "#151515";
 				}
 			});
 		}
