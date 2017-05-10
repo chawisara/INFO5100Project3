@@ -4,10 +4,12 @@
 <title>INFO 5100: Project 3 - Master Capstone</title>
 <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <style>
 	body { font-family: "Muli", sans-serif; background-color: black;}
-	/*svg {border: solid #ccc 1px; }*/
-	path { fill: #151515; stroke: white; stroke-width: 1px;}
+	/*svg {margin-left:auto; margin-right:auto; display: block}*/
+	svg {display: block; float:left;}
+	path { fill: #454545; stroke: #dfffa0; stroke-width: 1px;}
 </style>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -15,16 +17,36 @@
 <script src="https://d3js.org/d3-array.v1.min.js"></script>
 <script src="https://d3js.org/d3-geo.v1.min.js"></script>
 <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 </head>
 
 <body>
+	<br>
+	<div id="top products" style="margin:auto;"></div>
+	<br>
 	<svg id="map" height="650" width="1100">
 	</svg>
-	<br> <br>
+	<br><br>
+	<div id="buttons">
+		<button id="crops" style="cursor:pointer;">Crops</button>
+		<button id="livestock" style="cursor:pointer;">Livestock</button>
+		<button id="wildcrops" style="cursor:pointer;">Wild Crops</button>
+		<button id="handling" style="cursor:pointer;">Handling</button>
+		<button id="showAll" style="cursor:pointer;">Show All</button>
+	</div>
+	<br>
+	<form onreset="showAllFarms()">
+		<input type="text" id="datepicker" onchange="dateFilter(this.value)">
+		<input type="reset" value="Clear" >
+	</form>
 	<button type="button" id="Political" onclick="showelectionData(counties)"> Political v. Top 10 </button>
 	<script>
 		var svg = d3.select("#map");
+		var width=1100;
+		var height=650;
+		var centered;
 		var USprojection = d3.geoAlbersUsa();
 		var USpathGenerator = d3.geoPath().projection(USprojection);
 		var states;
@@ -32,6 +54,7 @@
 		var usdaAtlas;
 
 		var zipData, farmData, stateData, topTenData, USMapData, electionData;
+		var farms;
 
 		var parseRowZip = function(line) {
 			return{
@@ -120,8 +143,8 @@
 				electionFIPS.push(d.ComboFIPS);
 			});
 
-			console.log("electionFIPS")
-			console.log(electionFIPS)
+			// console.log("electionFIPS")
+			// console.log(electionFIPS)
 
 			topTenData.forEach(function(d){
 				toptenFIPS.push(d.FIPS);
@@ -131,8 +154,8 @@
 				electionResults.push({FIPS: d.ComboFIPS, Dem: d.DemPercent, GOP: d.RepPercent})
 			})
 
-			console.log("electionResults")
-			console.log(electionResults)
+			// console.log("electionResults")
+			// console.log(electionResults)
 
 			var farms=dataPoints(zipData, stateData, farmData);
 
@@ -189,16 +212,26 @@
 			return zipsObject[zipCode];
 		}
 
-		function showFarmsByState(farms, stateData, states){
+		function showFarmsByState(farmData, stateData, states){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
 
+			farms=farmData;
 
 			var paths=svg.selectAll("path.country").data(states.features);
 			paths.enter().append("path").attr("class","country")
 			.merge(paths)
 			.attr("d", function(country){
 				return USpathGenerator(country);
-			});
+			})
+			.on("mouseover", function(d){
+				this.setAttribute("style", "stroke-width: 4px");
+				this.setAttribute("cursor", "pointer");
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("style", "stroke-width: 1px");
+				this.setAttribute("cursor", "default");
+			})
+			.on("click", clicked);;
 
 			var max=0;
 
@@ -216,23 +249,7 @@
 
 			});
 
-			svg.selectAll("circle")
-			.data(farms)
-			.enter().append("circle")
-			.attr("id", function(d){return d.OperationName;})
-			.attr("cx", function(d){console.log(d.AddressZip+" "+d.Coordinates); return USprojection(d.Coordinates)[0];})
-			.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
-			.attr("r", 3)
-			.attr("opacity", 0.5)
-			.style("fill", "white")
-			.on("mouseover", function(d){
-				this.setAttribute("opacity", 1.0);
-				// this.setAttribute("cursor", "pointer");
-			})
-			.on("mouseout", function(d){
-				this.setAttribute("opacity", 0.7);
-				// this.setAttribute("cursor", "default");
-			});
+			showAllFarms();
 
 		}
 
@@ -251,33 +268,42 @@
 
 		function showelectionData(counties){
 			
-			console.log("in showelectionData")
+			// console.log("in showelectionData")
 			
 
 			//console.log(electionData);
 			// var colorBlue = d3.scale.threshold().domain([0.02, 0.04, 0.06, 0.08, 0.10]).range(["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#756bb1", "#54278f"]);
 			// var colorRed
-			console.log("showelectionData function")
+			// console.log("showelectionData function")
 			var colors = ["#4C0000", "#661919", "#7F3333", "#994C4C", "#B26666", "#CC7F7F", "#E59999", "#FFB2B2", "#FFCCCC", "#FFE5E5"];
 			var percentScale = d3.scaleQuantize().domain([0, 100]).range(colors);
 			var paths=svg.selectAll("path.country").data(counties.features);
-			console.log(paths)
+			// console.log(paths)
 			paths.enter().append("path").attr("class", "country")
 			.merge(paths)
 			.transition().duration(1000)
 			.style("fill", function(d) { 
 
 				if (electionFIPS.indexOf(d.id)>-1) {
-						console.log("next")
+						// console.log("next")
 						return "#4C0000"
 					} else {
-						return "#151515";
+						return "#454545";
 						// }
 					}
 			})
 			.attr("d", function (county) {
 				return USpathGenerator(county);
-			});
+			})
+			.on("mouseover", function(d){
+				this.setAttribute("style", "stroke-width: 4px");
+				this.setAttribute("cursor", "pointer");
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("style", "stroke-width: 1px");
+				this.setAttribute("cursor", "default");
+			})
+			.on("click", clicked);
 
 			//.style("fill", function (d) {
 			// 	if states.DemPercent < states.RepPercent{
@@ -310,6 +336,208 @@
 		//       .attr("d", path);
 		// }
 
+
+
+		//code reference: https://bl.ocks.org/mbostock/2206590
+
+		function clicked(d) {
+			var x, y, k;
+
+			if (d && centered !== d) {
+				var centroid = USpathGenerator.centroid(d);
+				x = centroid[0];
+				y = centroid[1];
+				k = 4;
+				centered = d;
+				svg.selectAll("circle")
+				.transition()
+				.duration(750)
+				.attr("r", 0.8);
+			} else {
+				x = width / 2;
+				y = height / 2;
+				k = 1;
+				centered = null;
+				svg.selectAll("circle")
+				.transition()
+				.duration(750)
+				.attr("r", 3);
+			}
+
+			svg.selectAll("path")
+			.classed("active", centered && function(d) { return d === centered; });
+
+			svg.transition()
+			.duration(750)
+			.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
+			.style("stroke-width", 1.5 / k + "px");
+
+		}
+
+		d3.select("#crops").on("click", crops_clicked);
+		d3.select("#livestock").on("click", livestock_clicked);
+		d3.select("#wildcrops").on("click", wildcrops_clicked);
+		d3.select("#handling").on("click", handling_clicked);
+		d3.select("#showAll").on("click", showAll_clicked);
+
+		function crops_clicked(){
+			d3.selectAll("circle").style("opacity", 0.5)
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 1.0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0.5);
+			});
+
+			d3.selectAll(".CertifiedCrops").style("opacity", 0)
+			.on("mouseover", function(d){
+				console.log("click");
+				this.setAttribute("opacity", 0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0);
+			});
+		}
+
+		function livestock_clicked(){
+			d3.selectAll("circle").style("opacity", 0.5)
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 1.0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0.5);
+			});
+
+			d3.selectAll(".CertifiedLivestock").style("opacity", 0)
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0);
+			});
+		}
+
+		function wildcrops_clicked(){
+			d3.selectAll("circle").style("opacity", 0.5)
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 1.0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0.5);
+			});
+
+			d3.selectAll(".CertifiedWildCrops").style("opacity", 0)
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0);
+			});
+		}
+
+		function handling_clicked(){
+			d3.selectAll("circle").style("opacity", 0.5)
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 1.0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0.5);
+			});
+
+			d3.selectAll(".CertifiedHandling").style("opacity", 0)
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0);
+			});
+		}
+
+		function showAll_clicked(){
+			d3.selectAll("circle").style("opacity", 0.5)
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 1.0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0.5);
+			});
+		}
+
+
+		$("#datepicker").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			showButtonPanel: true,
+			yearRange: '1975:2017',
+			maxDate: new Date(),
+			minDate: new Date(1975, 7, 31)
+		});
+
+		function dateFilter(inputDate){
+			if(inputDate==""){
+				showAllFarms();
+			}else{
+				svg.selectAll("circle").remove();
+				svg.selectAll("circle")
+				.data(farms.filter(function(d) {
+					var minDate=new Date(1975, 7, 31);
+					var farmDate=new Date(d.DateOfStatus);
+					var input=new Date(inputDate);
+					return farmDate<=input && farmDate>=minDate;
+				}))
+				.enter().append("circle")
+				.attr("id", function(d){return d.OperationName;})
+				.attr("class", function(d){
+					var classname="";
+					if(d.CertifiedCrops) classname="CertifiedCrops";
+					if(d.CertifiedHandling) classname+=" CertifiedHandling";
+					if(d.CertifiedLivestock) classname+=" CertifiedLivestock";
+					if(d.CertifiedWildCrops) classname+=" CertifiedWildCrops";
+					return classname;
+				})
+				.attr("cx", function(d){return USprojection(d.Coordinates)[0];})
+				.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
+				.attr("r", 3)
+				.attr("opacity", 0.5)
+				.style("fill", "white")
+				.on("mouseover", function(d){
+					this.setAttribute("opacity", 1.0);
+					// this.setAttribute("cursor", "pointer");
+				})
+				.on("mouseout", function(d){
+					this.setAttribute("opacity", 0.5);
+					// this.setAttribute("cursor", "default");
+				});
+			}
+
+		}
+
+		function showAllFarms(){
+			svg.selectAll("circle").remove();
+			svg.selectAll("circle")
+			.data(farms)
+			.enter().append("circle")
+			.attr("id", function(d){return d.OperationName;})
+			.attr("class", function(d){
+				var classname="";
+				if(d.CertifiedCrops) classname="CertifiedCrops";
+				if(d.CertifiedHandling) classname+=" CertifiedHandling";
+				if(d.CertifiedLivestock) classname+=" CertifiedLivestock";
+				if(d.CertifiedWildCrops) classname+=" CertifiedWildCrops";
+				return classname;
+			})
+			.attr("cx", function(d){return USprojection(d.Coordinates)[0];})
+			.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
+			.attr("r", 3)
+			.attr("opacity", 0.5)
+			.style("fill", "white")
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 1.0);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0.5);
+			});
+		}
 
 
 	</script>
