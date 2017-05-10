@@ -8,6 +8,7 @@
 	body { font-family: "Muli", sans-serif;}
 	/*svg {border: solid #ccc 1px; }*/
 	path { fill: #ccc; stroke: white; stroke-width: 1px;}
+
 </style>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -21,13 +22,17 @@
 <body>
 	<svg id="map" height="650" width="1100">
 	</svg>
+	<br> <br>
+	<button type="button" id="Political" onclick="showelectionData(counties)"> Political v. Top 10 </button>
 	<script>
 		var svg = d3.select("#map");
 		var USprojection = d3.geoAlbersUsa();
 		var USpathGenerator = d3.geoPath().projection(USprojection);
 		var states;
+		var counties;
+		var usdaAtlas;
 
-		var zipData, farmData, stateData, topTenData, USMapData;
+		var zipData, farmData, stateData, topTenData, USMapData, electionData;
 
 		var parseRowZip = function(line) {
 			return{
@@ -79,38 +84,66 @@
 			}
 		}
 
-		var toptenFIPS=[];
+		var parseElectionData = function(line){
+			return{
+				DemPercent: Number(line["per_dem"]),
+				RepPercent: Number(line["per_gop"]),
+				Abbreviation: line["state_abbr"],
+				County: line["county_name"],
+				ComboFIPS: Number(line["combined_fips"])
+				
+			}
+		}
 
+		var toptenFIPS=[];
+		var electionFIPS=[];
+		var electionResults=[];
+		
 		d3.queue()
 		.defer(d3.json, "us.json")
 		.defer(d3.csv, "zipcode.csv", parseRowZip)
 		.defer(d3.csv, "organicfarms.csv", parseRowFarms)
 		.defer(d3.csv, "statecoordinates.csv", parseRowStateCoordinates)
 		.defer(d3.csv, "toptenorganic.csv", parseTopTen)
-		.await(function(error, USMapData, zipData, farmData, stateData, topTenData){
+		.defer(d3.csv, "2016_US_County_Level_Presidential_Results.csv", parseElectionData)
+		.await(function(error, USMapData, zipData, farmData, stateData, topTenData, electionData){
 
 			states=topojson.feature(USMapData, USMapData.objects.states);
+			counties=topojson.feature(USMapData, USMapData.objects.counties);
 
 			zipData = zipData;
 			farmData = farmData;
 			stateData = stateData;
 			topTenData = topTenData;
+			electionData = electionData;
 
+			electionData.forEach(function(d){
+				electionFIPS.push(d.ComboFIPS);
+			});
 
-			// toptenFIPS = d3.map(topTenData, function(d) {
-			// 	return d.FIPS;
-			// });
+			console.log("electionFIPS")
+			console.log(electionFIPS)
 
 			topTenData.forEach(function(d){
 				toptenFIPS.push(d.FIPS);
 			});
 
+			electionData.forEach(function(d){
+				electionResults.push({FIPS: d.ComboFIPS, Dem: d.DemPercent, GOP: d.RepPercent})
+			})
+
+			console.log("electionResults")
+			console.log(electionResults)
 
 			var farms=dataPoints(zipData, stateData, farmData);
 
 			showFarmsByState(farms, stateData, states);
 
-			showtopTen(states);
+			//showtopTen(states);
+
+			
+
+			
 
 			
 		});
@@ -118,7 +151,7 @@
 		var zips = [];
 		var statecoordinates=[];
 		var zipsObject = {};
-		
+
 		function dataPoints(zipData, stateData, farmData){
 			var points = [];
 
@@ -212,18 +245,81 @@
 
 		}
 
-		function showtopTen(states){
-			var paths=svg.selectAll("path.country").data(states.features);
-			paths.enter().append("path").attr("class","country")
+		// function showtopTen(states){
+		// 	var paths=svg.selectAll("path.country").data(states.features);
+		// 	paths.enter().append("path").attr("class","country")
+		// 	.merge(paths)
+		// 	.style("fill", function (states) {
+		// 		if (toptenFIPS.indexOf(states.id)>-1) {
+		// 			return "#3566CC";
+		// 		}else{
+		// 			return "#ccc";
+		// 		}
+		// 	});
+		// }
+
+		function showelectionData(counties){
+			
+			console.log("in showelectionData")
+			
+
+			//console.log(electionData);
+			// var colorBlue = d3.scale.threshold().domain([0.02, 0.04, 0.06, 0.08, 0.10]).range(["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#756bb1", "#54278f"]);
+			// var colorRed
+			console.log("showelectionData function")
+			var colors = ["#4C0000", "#661919", "#7F3333", "#994C4C", "#B26666", "#CC7F7F", "#E59999", "#FFB2B2", "#FFCCCC", "#FFE5E5"];
+			var percentScale = d3.scaleQuantize().domain([0, 100]).range(colors);
+			var paths=svg.selectAll("path.country").data(counties.features);
+			console.log(paths)
+			paths.enter().append("path").attr("class", "country")
 			.merge(paths)
-			.style("fill", function (states) {
-				if (toptenFIPS.indexOf(states.id)>-1) {
-					return "#3566CC";
-				}else{
-					return "#ccc";
-				}
+			.transition().duration(1000)
+			.style("fill", function(d) { 
+
+				if (electionFIPS.indexOf(d.id)>-1) {
+						console.log("next")
+						return "#4C0000"
+					} else {
+						return "#ccc";
+						// }
+					}
+			})
+			.attr("d", function (county) {
+				return USpathGenerator(county);
 			});
+
+			//.style("fill", function (d) {
+			// 	if states.DemPercent < states.RepPercent{
+			// 		return colorBlue(d.RepPercent = electionFIPS.get(d.id));
+			// 	} else {
+			// 		return colorRed(d.DemPercent = electionData.get(d.id));
+			// 	}
+				
+			// });
+
 		}
+
+
+		// function ready(error, us) {
+		//   if (error) throw error;
+
+		//   svg.append("g")
+		//       .attr("class", "counties")
+		//     .selectAll("path")
+		//     .data(topojson.feature(USMapData, USMapData.objects.counties).features)
+		//     .enter().append("path")
+		//       .attr("fill", function(d) { return color(d.rate = unemployment.get(d.id)); })
+		//       .attr("d", path)
+		//     .append("title")
+		//       .text(function(d) { return d.rate + "%"; });
+
+		//   svg.append("path")
+		//       .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+		//       .attr("class", "states")
+		//       .attr("d", path);
+		// }
+
+
 
 	</script>
 </body>
