@@ -823,8 +823,10 @@
 					.style("stroke", "#419261")
 					.style("stroke-width", "1px");
 				}else{
-					svg.selectAll("text").style("opacity", 0);
-					svg.selectAll(".animating").attr("opacity", 0);
+					svg.selectAll("text").remove();
+					// svg.selectAll("text").style("display", "none");
+					svg.selectAll(".animating").remove();
+					// svg.selectAll(".animating").style("display", "none");
 				}
 
 				
