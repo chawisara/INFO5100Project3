@@ -742,7 +742,7 @@
 			});
 		}
 
-		var timeAnimation;
+		var timeAnimation=0;
 		var skipClicked=false;
 		var count=0;
 
@@ -770,7 +770,14 @@
 				showAllFarms();
 			});
 
+
+			if(timeAnimation==null) svg.selectAll("text").remove();
+
 			farms.forEach(function(farm){
+				if(count==15853){
+					console.log("end");
+					svg.selectAll("text").remove();
+				}
 				if(!skipClicked) animateFarms(farm);
 				else{
 					clearTimeout(timeAnimation);
@@ -778,7 +785,7 @@
 					return false;
 				}
 			});
-			
+
 		}
 
 		function animateFarms(farm){
@@ -846,8 +853,6 @@
 					svg.selectAll(".animating").remove();
 					// svg.selectAll(".animating").style("display", "none");
 				}
-
-				
 
 			}, 3000);
 		}
