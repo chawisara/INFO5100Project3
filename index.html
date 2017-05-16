@@ -120,7 +120,6 @@
 		}
 
 		var toptenFIPS=[];
-		var electionFIPS=[];
 		var electionResults=[];
 		
 		d3.queue()
@@ -141,13 +140,6 @@
 			topTenData = topTenData;
 			ElectionData = ElectionData;
 
-			ElectionData.forEach(function(d){
-				electionFIPS.push(d.ComboFIPS);
-			});
-
-			// console.log("electionFIPS")
-			// console.log(electionFIPS)
-
 			topTenData.forEach(function(d){
 				toptenFIPS.push(d.FIPS);
 			});
@@ -157,16 +149,9 @@
 				electionResults.push(data)
 			})
 
-			//console.log(electionResults)
-
-			// console.log("electionResults")
-			// console.log(electionResults)
-
 			var farms=dataPoints(zipData, stateData, farmData);
 
 			showFarmsByState(farms, stateData, states);
-
-			//showtopTen(states);
 
 		});
 
@@ -449,23 +434,12 @@
 		// }
 
 		function showelectionData(counties){
-			
-			// console.log("in showelectionData")
-			
 
-			//console.log(electionData);
-			var colorBlue = d3.scaleThreshold().domain([0.10, 0.30, 0.50, 0.70, 0.90]).range(["#615CFF","#3A33FF","#120AFF","#0700E0"]);
-			// var colorRed
-			//var blue = ["#615CFF","#3A33FF","#120AFF","#0700E0"];
-			//var colorBlue = d3.scaleQuantize().domain(d3.range(0, 1)).range(blue);
-
-			// console.log("showelectionData function")
-			var colorRed = d3.scaleThreshold().domain([0.10, 0.30, 0.50, 0.70, 0.90]).range(["#F6948D","#F47167","#F14D41","#EE291B","#D11D10"]);
+			//help from: https://bl.ocks.org/mbostock/3306362
+			var colorBlue = d3.scaleLinear().domain([0.0, 0.33, 0.66, 1.0]).range(["#FFFFFF","#85C6FF","#0A8DFF","#002C52"]);
+		
+			var colorRed = d3.scaleLinear().domain([0.0, 0.33, 0.66, 1.0]).range(["#FFFFFF","#F58E8E","#EB1E1E","#4B0707"]);
 			
-			//var red = ["#F6948D","#F47167","#F14D41","#EE291B","#D11D10"];
-			//var colorRed = d3.scaleQuantize().domain(d3.range(0, 1)).range(red);
-
-			//var percentScale = d3.scaleQuantize().domain([0, 100]).range(colors);
 			var paths=svg.selectAll("path.country").data(counties.features);
 			paths.enter().append("path").attr("class", "country")
 			.merge(paths)
@@ -486,8 +460,12 @@
 				for (i=0; i < electionResults.length; i++){
 					if (d.id == electionResults[i].FIPS) {
 						if (electionResults[i].Dem > electionResults[i].GOP){
+							//console.log("DEM")
+							//console.log(electionResults[i].Dem)
 							return colorBlue(electionResults[i].Dem)
 						} else {
+							//console.log("GOP")
+							//console.log(electionResults[i].Dem)
 							return colorRed(electionResults[i].GOP);
 						// }
 						}
@@ -499,19 +477,6 @@
 			svg.selectAll("circle").remove();
 
 			showAllFarms();
-
-			// electionData.forEach(function(d){
-			// 	electionResults.push({FIPS: d.ComboFIPS, Dem: d.DemPercent, GOP: d.RepPercent})
-			// })
-
-			//.style("fill", function (d) {
-			// 	if states.DemPercent < states.RepPercent{
-			// 		return colorBlue(d.RepPercent = electionFIPS.get(d.id));
-			// 	} else {
-			// 		return colorRed(d.DemPercent = electionData.get(d.id));
-			// 	}
-				
-			// });
 
 		}
 
