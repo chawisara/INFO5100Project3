@@ -53,6 +53,8 @@
 		var counties;
 		var usdaAtlas;
 
+		var loadpage=true;
+
 		var zipData, farmData, stateData, topTenData, USMapData, electionData;
 		var farms;
 
@@ -168,6 +170,16 @@
 		// var zips = [];
 		var statecoordinates=[];
 		var zipsObject = {};
+		var top5crops=[];
+		var top5livestock=[];
+		var top5wildcrops=[];
+		var top5handling=[];
+
+		var allCrops={};
+		var allLivestock={};
+		var allWildCrops={};
+		var allHandling={};
+
 
 		function dataPoints(zipData, stateData, farmData){
 			var points = [];
@@ -181,7 +193,7 @@
 			
 			stateData.forEach(function(d){
 				var coordinates=[d.Longitude, d.Latitude];
-				var state={State: d.State, Coordinates: coordinates, FarmCount: 0};
+				var state={State: d.State, Coordinates: coordinates, FarmCount: 0, TopScope: ""};
 				statecoordinates.push(state);
 			});
 
@@ -203,9 +215,154 @@
 					points.push(point);
 				}
 
+				//crops
+				if(data.CertifiedCrops!=undefined){
+					var index=data.CertifiedCrops.indexOf(":");
+					var crops=data.CertifiedCrops.substring(index+1);
+					crops=crops.split(",");
+					countScope(crops, "crops");
+				}
+
+				if(data.AdditionalCrops!=undefined){
+					var index=data.AdditionalCrops.indexOf(":");
+					var additionalcrops=data.AdditionalCrops.substring(index+1);
+					additionalcrops=additionalcrops.split(",");
+					countScope(additionalcrops, "crops");
+				}
+
+				//livestock
+				if(data.CertifiedLivestock!=undefined){
+					var index=data.CertifiedLivestock.indexOf(":");
+					var livestock=data.CertifiedLivestock.substring(index+1);
+					livestock=livestock.split(",");
+					countScope(livestock, "livestock");
+				}
+
+				if(data.AdditionalLivestock!=undefined){
+					var index=data.AdditionalLivestock.indexOf(":");
+					var additionallivestock=data.AdditionalLivestock.substring(index+1);
+					additionallivestock=additionallivestock.split(",");
+					countScope(additionallivestock, "livestock");
+				}
+
+				//wild crops
+				if(data.CertifiedWildCrops!=undefined){
+					var index=data.CertifiedWildCrops.indexOf(":");
+					var wildcrops=data.CertifiedWildCrops.substring(index+1);
+					wildcrops=wildcrops.split(",");
+					countScope(wildcrops, "wildcrops");
+				}
+
+				if(data.AdditionalWildCrops!=undefined){
+					var index=data.AdditionalWildCrops.indexOf(":");
+					var additionalwildcrops=data.AdditionalWildCrops.substring(index+1);
+					additionalwildcrops=additionalwildcrops.split(",");
+					countScope(additionalwildcrops, "wildcrops");
+				}
+
+				//handling
+				if(data.CertifiedHandling!=undefined){
+					var index=data.CertifiedHandling.indexOf(":");
+					var handling=data.CertifiedHandling.substring(index+1);
+					handling=handling.split(",");
+					countScope(handling, "handling");
+				}
+
+				if(data.AdditionalHandling!=undefined){
+					var index=data.AdditionalHandling.indexOf(":");
+					var additionalhandling=data.AdditionalHandling.substring(index+1);
+					additionalhandling=additionalhandling.split(",");
+					countScope(additionalhandling, "handling");
+				}
 			});
 
+			findTop5();
+			console.log(top5crops);
+			console.log(top5livestock);
+			console.log(top5wildcrops);
+			console.log(top5handling);
+
 			return points;
+		}
+
+		function countScope(allItems, scope){
+			if(scope=="crops"){
+				for(var i=0; i<allItems.length; i++){
+					var item=allItems[i].trim();
+					if(item!=""){
+						if(!allCrops[item]) allCrops[item]=1;
+						else allCrops[item]+=1;
+					}
+					
+				}
+			}else if(scope=="livestock"){
+				for(var i=0; i<allItems.length; i++){
+					var item=allItems[i].trim();
+					if(item!=""){
+						if(!allLivestock[item]) allLivestock[item]=1;
+						else allLivestock[item]+=1;
+					}
+				}
+			}else if(scope=="wildcrops"){
+				for(var i=0; i<allItems.length; i++){
+					var item=allItems[i].trim();
+					if(item!=""){
+						if(!allWildCrops[item]) allWildCrops[item]=1;
+						else allWildCrops[item]+=1;
+					}
+				}
+			}else if(scope=="handling"){
+				for(var i=0; i<allItems.length; i++){
+					var item=allItems[i].trim();
+					if(item!=""){
+						if(!allHandling[item]) allHandling[item]=1;
+						else allHandling[item]+=1;
+					}
+				}
+			}
+		}
+
+		function findTop5(){
+			var cropsArray = [];
+			for (var crop in allCrops) {
+				cropsArray.push([crop, allCrops[crop]]);
+			}
+			cropsArray.sort(function(a, b) {
+				return b[1]-a[1];
+			});
+
+			top5crops=[cropsArray[0][0], cropsArray[1][0], cropsArray[2][0], cropsArray[3][0], cropsArray[4][0]];
+
+			var livestockArray = [];
+			for (var livestock in allLivestock) {
+				livestockArray.push([livestock, allLivestock[livestock]]);
+			}
+			livestockArray.sort(function(a, b) {
+				return b[1]-a[1];
+			});
+
+			top5livestock=[livestockArray[0][0], livestockArray[1][0], livestockArray[2][0], livestockArray[3][0], livestockArray[4][0]];
+
+			var wildcropsArray = [];
+			for (var wildcrop in allWildCrops) {
+				wildcropsArray.push([wildcrop, allWildCrops[wildcrop]]);
+			}
+			wildcropsArray.sort(function(a, b) {
+				return b[1]-a[1];
+			});
+
+			top5wildcrops=[wildcropsArray[0][0], wildcropsArray[1][0], wildcropsArray[2][0], wildcropsArray[3][0], wildcropsArray[4][0]];
+
+			var handlingArray = [];
+			for (var handling in allHandling) {
+				handlingArray.push([handling, allHandling[handling]]);
+			}
+			handlingArray.sort(function(a, b) {
+				return b[1]-a[1];
+			});
+
+			top5handling=[handlingArray[0][0], handlingArray[1][0], handlingArray[2][0], handlingArray[3][0], handlingArray[4][0]];
+
 		}
 
 		function getZipCoordinate(zipCode) {
@@ -237,19 +394,41 @@
 
 			statecoordinates.forEach(function(state){
 				var count=0;
+				// var cropscount=0, livestockcount=0, wildcropscount=0, handlingcount=0;
 
 				farms.forEach(function(farm){
 					if(state.State==farm.AddressState){
 						count++;
 					}
+					// if(farm.CertifiedCrops) cropscount++;
+					// if(farm.AdditionalCrops) cropscount++;
+					// if(farm.CertifiedLivestock) livestockcount++;
+					// if(farm.AdditionalLivestock) livestockcount++;
+					// if(farm.CertifiedWildCrops) wildcropscount++;
+					// if(farm.AdditionalWildCrops) wildcropscount++;
+					// if(farm.CertifiedHandling) handlingcount++;
+					// if(farm.AdditionalHandling) handlingcount++;
 				});
 
 				state.FarmCount=count;
 				if(max<count) max=count;
 
+				// var maxscope=Math.max(cropscount, livestockcount, wildcropscount, handlingcount);
+				// if(maxscope==cropscount) state.TopScope="Crops";
+				// else if(maxscope==livestockcount) state.TopScope="Livestock";
+				// else if(maxscope==wildcropscount) state.TopScope="Wild Crops";
+				// else state.TopScope="Handling";
+
+				// console.log(state.TopScope);
+
 			});
 
-			showAllFarms();
+			if(loadpage){
+				showAllFarmsAnimation();
+				loadpage=false;
+			}else{
+				showAllFarms();
+			}
 
 		}
 
@@ -393,7 +572,6 @@
 
 			d3.selectAll(".CertifiedCrops").style("opacity", 0)
 			.on("mouseover", function(d){
-				console.log("click");
 				this.setAttribute("opacity", 0);
 			})
 			.on("mouseout", function(d){
@@ -516,6 +694,11 @@
 
 		function showAllFarms(){
 			svg.selectAll("circle").remove();
+			svg.selectAll("text").remove();
+
+			clearTimeout(timeAnimation);
+			timeAnimation = null;
+
 			svg.selectAll("circle")
 			.data(farms)
 			.enter().append("circle")
@@ -539,6 +722,114 @@
 			.on("mouseout", function(d){
 				this.setAttribute("opacity", 0.5);
 			});
+		}
+
+		var timeAnimation;
+		var skipClicked=false;
+		var count=0;
+
+		function showAllFarmsAnimation(){
+			svg.selectAll("circle").remove();
+
+			svg.append("text")
+			.attr("id", "skip")
+			.attr("x", width/2)
+			.attr("y", 600)
+			.text("[ Skip ]")
+			.attr("fill", "white")
+			.attr("font-size", "20pt")
+			.style("text-anchor", "middle")
+			.style("opacity", 0.9)
+			.style("stroke", "#419261")
+			.style("stroke-width", "1px")
+			.on("mouseover", function(d){
+				this.setAttribute("cursor", "pointer");
+			})
+			.on("click", function(d){
+				skipClicked=true;
+				clearTimeout(timeAnimation);
+				timeAnimation = null;
+				showAllFarms();
+			});
+
+			farms.forEach(function(farm){
+				if(!skipClicked) animateFarms(farm);
+				else{
+					clearTimeout(timeAnimation);
+					timeAnimation=null;
+					return false;
+				}
+			});
+			
+		}
+
+		function animateFarms(farm){
+			timeAnimation=setTimeout(function(){
+				count++;
+
+				svg.select("#year").remove();
+				svg.select("#numfarm").remove();
+
+				if(!skipClicked){
+					svg.append("circle")
+					.attr("id", function(d){return farm.OperationName;})
+					.attr("class", function(d){
+						var classname="";
+						if(farm.CertifiedCrops) classname="CertifiedCrops";
+						if(farm.CertifiedHandling) classname+=" CertifiedHandling";
+						if(farm.CertifiedLivestock) classname+=" CertifiedLivestock";
+						if(farm.CertifiedWildCrops) classname+=" CertifiedWildCrops";
+						classname+=" animating";
+						return classname;
+					})
+					.attr("cx", function(d){return USprojection(farm.Coordinates)[0];})
+					.attr("cy", function(d){return USprojection(farm.Coordinates)[1];})
+					.attr("r", 3)
+					.attr("opacity", 0.5)
+					.style("fill", "white")
+					.on("mouseover", function(d){
+						this.setAttribute("opacity", 1.0);
+					})
+					.on("mouseout", function(d){
+						this.setAttribute("opacity", 0.5);
+					});
+
+					svg.append("text")
+					.attr("id", "year")
+					.attr("x", 100)
+					.attr("y", 550)
+					.text(function(d){
+						var farmDate=new Date(farm.DateOfStatus);
+						return "Year: "+farmDate.getFullYear();
+					})
+					.attr("fill", "white")
+					.attr("font-size", "20pt")
+					.style("text-anchor", "middle")
+					.style("opacity", 0.9)
+					.style("stroke", "#419261")
+					.style("stroke-width", "1px");
+
+					svg.append("text")
+					.attr("id", "numfarm")
+					.attr("x", 150)
+					.attr("y", 600)
+					.text(function(d){
+						return "# Organic Farms: "+count;
+					})
+					.attr("fill", "white")
+					.attr("font-size", "20pt")
+					.style("text-anchor", "middle")
+					.style("opacity", 0.9)
+					.style("stroke", "#419261")
+					.style("stroke-width", "1px");
+				}else{
+					svg.selectAll("text").style("opacity", 0);
+					svg.selectAll(".animating").attr("opacity", 0);
+				}
+
+				
+
+			}, 3000);
 		}
 
 
