@@ -231,7 +231,7 @@
 				this.setAttribute("style", "stroke-width: 1px");
 				this.setAttribute("cursor", "default");
 			})
-			.on("click", clicked);;
+			.on("click", clicked);
 
 			var max=0;
 
@@ -278,20 +278,8 @@
 			var colors = ["#4C0000", "#661919", "#7F3333", "#994C4C", "#B26666", "#CC7F7F", "#E59999", "#FFB2B2", "#FFCCCC", "#FFE5E5"];
 			var percentScale = d3.scaleQuantize().domain([0, 100]).range(colors);
 			var paths=svg.selectAll("path.country").data(counties.features);
-			// console.log(paths)
 			paths.enter().append("path").attr("class", "country")
 			.merge(paths)
-			.transition().duration(1000)
-			.style("fill", function(d) { 
-
-				if (electionFIPS.indexOf(d.id)>-1) {
-						// console.log("next")
-						return "#4C0000"
-					} else {
-						return "#454545";
-						// }
-					}
-			})
 			.attr("d", function (county) {
 				return USpathGenerator(county);
 			})
@@ -303,7 +291,21 @@
 				this.setAttribute("style", "stroke-width: 1px");
 				this.setAttribute("cursor", "default");
 			})
-			.on("click", clicked);
+			.on("click", clicked)
+			.transition().duration(1000)
+			.style("fill", function(d) {
+				if (electionFIPS.indexOf(d.id)>-1) {
+						// console.log("next")
+						return "#4C0000"
+					} else {
+						return "#454545";
+						// }
+					}
+			});
+
+			svg.selectAll("circle").remove();
+
+			showAllFarms();
 
 			//.style("fill", function (d) {
 			// 	if states.DemPercent < states.RepPercent{
