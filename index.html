@@ -130,7 +130,7 @@
 		.defer(d3.csv, "statecoordinates.csv", parseRowStateCoordinates)
 		.defer(d3.csv, "toptenorganic.csv", parseTopTen)
 		.defer(d3.csv, "2016_US_County_Level_Presidential_Results.csv", parseElectionData)
-		.await(function(error, USMapData, zipData, farmData, stateData, topTenData, electionData){
+		.await(function(error, USMapData, zipData, farmData, stateData, topTenData, ElectionData){
 
 			states=topojson.feature(USMapData, USMapData.objects.states);
 			counties=topojson.feature(USMapData, USMapData.objects.counties);
@@ -139,9 +139,9 @@
 			farmData = farmData;
 			stateData = stateData;
 			topTenData = topTenData;
-			electionData = electionData;
+			ElectionData = ElectionData;
 
-			electionData.forEach(function(d){
+			ElectionData.forEach(function(d){
 				electionFIPS.push(d.ComboFIPS);
 			});
 
@@ -152,9 +152,12 @@
 				toptenFIPS.push(d.FIPS);
 			});
 
-			electionData.forEach(function(d){
-				electionResults.push({FIPS: d.ComboFIPS, Dem: d.DemPercent, GOP: d.RepPercent})
+			ElectionData.forEach(function(d){
+				var data = {FIPS: d.ComboFIPS, Dem: d.DemPercent, GOP: d.RepPercent}
+				electionResults.push(data)
 			})
+
+			//console.log(electionResults)
 
 			// console.log("electionResults")
 			// console.log(electionResults)
@@ -473,18 +476,31 @@
 			.on("click", clicked)
 			.transition().duration(1000)
 			.style("fill", function(d) {
-				if (electionFIPS.indexOf(d.id)>-1) {
-						// console.log("next")
-						return "#4C0000"
+				console.log("styles")
+				console.log(electionResults[0].FIPS)
+				console.log(electionResults.length)
+				for (i=0; i < electionResults.length; i++){
+					console.log("in for loop")
+					console.log(electionResults[i].FIPS)
+					console.log(electionResults[i].Dem)
+					if (d.valueOf(d.id) == electionResults[i].FIPS) {
+						if (electionResults[i].Dem > electionResults[i].GOP)
+						return "#661919"
 					} else {
-						return "#454545";
+						return "#4C0000";
 						// }
 					}
+				}
+				
 			});
 
 			svg.selectAll("circle").remove();
 
 			showAllFarms();
+
+			// electionData.forEach(function(d){
+			// 	electionResults.push({FIPS: d.ComboFIPS, Dem: d.DemPercent, GOP: d.RepPercent})
+			// })
 
 			//.style("fill", function (d) {
 			// 	if states.DemPercent < states.RepPercent{
