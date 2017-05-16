@@ -454,41 +454,43 @@
 			
 
 			//console.log(electionData);
-			// var colorBlue = d3.scale.threshold().domain([0.02, 0.04, 0.06, 0.08, 0.10]).range(["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#756bb1", "#54278f"]);
+			var colorBlue = d3.scaleThreshold().domain([0.10, 0.30, 0.50, 0.70, 0.90]).range(["#615CFF","#3A33FF","#120AFF","#0700E0"]);
 			// var colorRed
+			//var blue = ["#615CFF","#3A33FF","#120AFF","#0700E0"];
+			//var colorBlue = d3.scaleQuantize().domain(d3.range(0, 1)).range(blue);
+
 			// console.log("showelectionData function")
-			var colors = ["#4C0000", "#661919", "#7F3333", "#994C4C", "#B26666", "#CC7F7F", "#E59999", "#FFB2B2", "#FFCCCC", "#FFE5E5"];
-			var percentScale = d3.scaleQuantize().domain([0, 100]).range(colors);
+			var colorRed = d3.scaleThreshold().domain([0.10, 0.30, 0.50, 0.70, 0.90]).range(["#F6948D","#F47167","#F14D41","#EE291B","#D11D10"]);
+			
+			//var red = ["#F6948D","#F47167","#F14D41","#EE291B","#D11D10"];
+			//var colorRed = d3.scaleQuantize().domain(d3.range(0, 1)).range(red);
+
+			//var percentScale = d3.scaleQuantize().domain([0, 100]).range(colors);
 			var paths=svg.selectAll("path.country").data(counties.features);
 			paths.enter().append("path").attr("class", "country")
 			.merge(paths)
 			.attr("d", function (county) {
 				return USpathGenerator(county);
 			})
-			.on("mouseover", function(d){
-				this.setAttribute("style", "stroke-width: 4px");
-				this.setAttribute("cursor", "pointer");
-			})
-			.on("mouseout", function(d){
-				this.setAttribute("style", "stroke-width: 1px");
-				this.setAttribute("cursor", "default");
-			})
+			// .on("mouseover", function(d){
+			// 	this.setAttribute("style", "stroke-width: 4px");
+			// 	this.setAttribute("cursor", "pointer");
+			// })
+			// .on("mouseout", function(d){
+			// 	this.setAttribute("style", "stroke-width: 1px");
+			// 	this.setAttribute("cursor", "default");
+			// })
 			.on("click", clicked)
 			.transition().duration(1000)
 			.style("fill", function(d) {
-				console.log("styles")
-				console.log(electionResults[0].FIPS)
-				console.log(electionResults.length)
 				for (i=0; i < electionResults.length; i++){
-					console.log("in for loop")
-					console.log(electionResults[i].FIPS)
-					console.log(electionResults[i].Dem)
-					if (d.valueOf(d.id) == electionResults[i].FIPS) {
-						if (electionResults[i].Dem > electionResults[i].GOP)
-						return "#661919"
-					} else {
-						return "#4C0000";
+					if (d.id == electionResults[i].FIPS) {
+						if (electionResults[i].Dem > electionResults[i].GOP){
+							return colorBlue(electionResults[i].Dem)
+						} else {
+							return colorRed(electionResults[i].GOP);
 						// }
+						}
 					}
 				}
 				
