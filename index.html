@@ -289,13 +289,13 @@
 			}else if(scope=="livestock"){
 				for(var i=0; i<allItems.length; i++){
 					var item=allItems[i].trim().toLowerCase();
-					if(item!="" && !item.includes("replacement") && !item.includes("ramps") && item!="various" && item!="all eligible for organic slaughter" && item!="live"){
-						if(item.includes("milk")){
+					if(item!="" && !item.includes("replacement") && !item.includes("ramps") && item!="various" && !item.includes("slaughter") && item!="live" && item!="layers"){
+						if(item.includes("milk")||item.includes("dairy cattle")||item.includes("dairy cow")){
 							if(allLivestock["milk"]) allLivestock["milk"]+=1;
 							else allLivestock["milk"]=1;
-						} else if(item.includes("dairy cattle")){
-							if(allLivestock["dairy cattle"]) allLivestock["dairy cattle"]+=1;
-							else allLivestock["dairy cattle"]=1;
+						}else if(item.includes("eggs")||item.includes("hens")){
+							if(allLivestock["eggs"]) allLivestock["eggs"]+=1;
+							else allLivestock["eggs"]=1;
 						}else if(!allLivestock[item]) allLivestock[item]=1;
 						else allLivestock[item]+=1;
 					}
