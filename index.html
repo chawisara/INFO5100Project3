@@ -46,6 +46,8 @@
 	<p> Click the Political v. Top 10 button to look at the top 10 states in organic sales and each of their county's political outcome from the 2016 election.</p>
 	<button type="button" id="Political" onclick="showelectionData(counties)"> Political v. Top 10 States in Organic Sales </button>
 	</div>
+	<br>
+	<button type="button" id="reset" onclick="showOriginalMap(states)"> Reset Map </button>
 	<script>
 		var svg = d3.select("#map");
 		var width=1100;
@@ -424,22 +426,8 @@
 
 		}
 
-		// function showtopTen(states){
-		// 	var paths=svg.selectAll("path.country").data(states.features);
-		// 	paths.enter().append("path").attr("class","country")
-		// 	.merge(paths)
-		// 	.style("fill", function (states) {
-		// 		if (toptenFIPS.indexOf(states.id)>-1) {
-		// 			return "#3566CC";
-		// 		}else{
-		// 			return "#ccc";
-		// 		}
-		// 	});
-		// }
-
 		function showelectionData(counties){
 
-			//help from: https://bl.ocks.org/mbostock/3306362
 			var colorBlue = d3.scaleLinear().domain([0.0, 0.33, 0.66, 1.0]).range(["#FFFFFF","#85C6FF","#0A8DFF","#002C52"]);
 		
 			var colorRed = d3.scaleLinear().domain([0.0, 0.33, 0.66, 1.0]).range(["#FFFFFF","#F58E8E","#EB1E1E","#4B0707"]);
@@ -482,8 +470,33 @@
 
 			showAllFarms();
 
+			
+
 		}
 
+		function showOriginalMap(states){
+			
+			
+			svg.selectAll("path.country")
+        	.remove();
+        	
+
+        	USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
+			console.log("is function working")
+			var paths=svg.selectAll("path.country").data(states.features);
+			paths.enter().append("path").attr("class","country")
+			.merge(paths)
+			.attr("d", function(country){
+				return USpathGenerator(country);
+			})
+			.style("fill", "#454545");
+
+			svg.selectAll("circle").remove();
+
+			showAllFarms();
+			showFarmsByState(farms, stateData, states);
+
+		}
 
 		// function ready(error, us) {
 		//   if (error) throw error;
