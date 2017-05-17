@@ -743,17 +743,19 @@
 			if(timeAnimation==null) svg.selectAll("text").remove();
 
 			farms.forEach(function(farm){
-				if(count==15853){
-					console.log("end");
+
+				if(skipClicked){
 					svg.selectAll("text").remove();
-				}
-				if(!skipClicked) animateFarms(farm);
-				else{
+					svg.selectAll("circle").remove();
 					clearTimeout(timeAnimation);
 					timeAnimation=null;
 					return false;
+				}else{
+					animateFarms(farm);
 				}
+
 			});
+
 
 		}
 
@@ -788,39 +790,39 @@
 						this.setAttribute("opacity", 0.5);
 					});
 
-					svg.append("text")
-					.attr("id", "year")
-					.attr("x", 100)
-					.attr("y", 550)
-					.text(function(d){
-						var farmDate=new Date(farm.DateOfStatus);
-						return "Year: "+farmDate.getFullYear();
-					})
-					.attr("fill", "white")
-					.attr("font-size", "20pt")
-					.style("text-anchor", "middle")
-					.style("opacity", 0.9)
-					.style("stroke", "#419261")
-					.style("stroke-width", "1px");
+					if(count<farms.length){
+						svg.append("text")
+						.attr("id", "year")
+						.attr("x", 100)
+						.attr("y", 550)
+						.text(function(d){
+							var farmDate=new Date(farm.DateOfStatus);
+							return "Year: "+farmDate.getFullYear();
+						})
+						.attr("fill", "white")
+						.attr("font-size", "20pt")
+						.style("text-anchor", "middle")
+						.style("opacity", 0.9)
+						.style("stroke", "#419261")
+						.style("stroke-width", "1px");
 
-					svg.append("text")
-					.attr("id", "numfarm")
-					.attr("x", 150)
-					.attr("y", 600)
-					.text(function(d){
-						return "# Organic Farms: "+count;
-					})
-					.attr("fill", "white")
-					.attr("font-size", "20pt")
-					.style("text-anchor", "middle")
-					.style("opacity", 0.9)
-					.style("stroke", "#419261")
-					.style("stroke-width", "1px");
-				}else{
-					svg.selectAll("text").remove();
-					// svg.selectAll("text").style("display", "none");
-					svg.selectAll(".animating").remove();
-					// svg.selectAll(".animating").style("display", "none");
+						svg.append("text")
+						.attr("id", "numfarm")
+						.attr("x", 150)
+						.attr("y", 600)
+						.text(function(d){
+							return "# Organic Farms: "+count;
+						})
+						.attr("fill", "white")
+						.attr("font-size", "20pt")
+						.style("text-anchor", "middle")
+						.style("opacity", 0.9)
+						.style("stroke", "#419261")
+						.style("stroke-width", "1px");
+					}else{
+						svg.selectAll("text").remove();
+					}
+					
 				}
 
 			}, 3000);
