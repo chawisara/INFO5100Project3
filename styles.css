@@ -5,3 +5,26 @@ h1 {
 	margin-top: 50px;
 	text-align: center;
 }
+
+body { 
+	font-family: "Muli", sans-serif; 
+	background-color: #3086C6;
+}
+
+/*svg {margin-left:auto; margin-right:auto; display: block}*/
+svg {
+	display: block; 
+	float:left;
+	margin-right: 50px;
+}
+
+path { 
+	fill: #0F293C; 
+	stroke: #3086C6; 
+	stroke-width: 1px;
+}
+	
+#political p{
+	color:white; 
+	font-size: 10pt;
+}
