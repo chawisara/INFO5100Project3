@@ -715,6 +715,7 @@
 			.style("fill", "white")
 			.on("mouseover", function(d){
 				this.setAttribute("opacity", 1.0);
+				div.html(d.farm.OperationName);
 			})
 			.on("mouseout", function(d){
 				this.setAttribute("opacity", 0.5);
@@ -796,6 +797,8 @@
 					// .style("fill", "white")
 					.on("mouseover", function(d){
 						this.setAttribute("opacity", 1.0);
+						div.html(d.farm.OperationName);
+						
 					})
 					.on("mouseout", function(d){
 						this.setAttribute("opacity", 0.5);
