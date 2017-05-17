@@ -777,7 +777,7 @@
 				svg.select("#numfarm").remove();
 
 				if(!skipClicked){
-					svg.append("circle")
+					svg.append("svg:image")
 					.attr("id", function(d){return farm.OperationName;})
 					.attr("class", function(d){
 						var classname="";
@@ -788,11 +788,12 @@
 						classname+=" animating";
 						return classname;
 					})
-					.attr("cx", function(d){return USprojection(farm.Coordinates)[0];})
-					.attr("cy", function(d){return USprojection(farm.Coordinates)[1];})
-					.attr("r", 3)
+					.attr("xlink:href", "images/star/star2.png")
+					.attr("x", function(d){return USprojection(farm.Coordinates)[0];})
+					.attr("y", function(d){return USprojection(farm.Coordinates)[1];})
+					// .attr("r", 3)
 					.attr("opacity", 0.5)
-					.style("fill", "white")
+					// .style("fill", "white")
 					.on("mouseover", function(d){
 						this.setAttribute("opacity", 1.0);
 					})
