@@ -5,11 +5,12 @@
 <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="styles.css">
 <style>
-	body { font-family: "Muli", sans-serif; background-color: black;}
+	body { font-family: "Muli", sans-serif; background-color: #3086C6;}
 	/*svg {margin-left:auto; margin-right:auto; display: block}*/
 	svg {display: block; float:left;}
-	path { fill: #454545; stroke: #dfffa0; stroke-width: 1px;}
+	path { fill: #0F293C; stroke: #3086C6; stroke-width: 1px;}
 	#political p{color:white; font-size: 10pt;}
 </style>
 
@@ -24,6 +25,7 @@
 </head>
 
 <body>
+	<h1>Where Are the Organic Farms in the U.S.?</h1>
 	<br>
 	<div id="top products" style="margin:auto;"></div>
 	<br>
@@ -733,14 +735,14 @@
 
 			svg.append("text")
 			.attr("id", "skip")
-			.attr("x", width/2)
-			.attr("y", 600)
+			.attr("x", 650)
+			.attr("y", 630)
 			.text("[ Skip ]")
 			.attr("fill", "white")
 			.attr("font-size", "20pt")
 			.style("text-anchor", "middle")
 			.style("opacity", 0.9)
-			.style("stroke", "#419261")
+			// .style("stroke", "#419261")
 			.style("stroke-width", "1px")
 			.on("mouseover", function(d){
 				this.setAttribute("cursor", "pointer");
@@ -806,31 +808,31 @@
 					if(count<farms.length){
 						svg.append("text")
 						.attr("id", "year")
-						.attr("x", 100)
-						.attr("y", 550)
+						.attr("x", 50)
+						.attr("y", 450)
 						.text(function(d){
 							var farmDate=new Date(farm.DateOfStatus);
 							return "Year: "+farmDate.getFullYear();
 						})
 						.attr("fill", "white")
-						.attr("font-size", "20pt")
-						.style("text-anchor", "middle")
+						.attr("font-size", "17px")
+						.style("text-anchor", "left")
 						.style("opacity", 0.9)
-						.style("stroke", "#419261")
+						// .style("stroke", "#419261")
 						.style("stroke-width", "1px");
 
 						svg.append("text")
 						.attr("id", "numfarm")
-						.attr("x", 150)
-						.attr("y", 600)
+						.attr("x", 50)
+						.attr("y", 480)
 						.text(function(d){
 							return "# Organic Farms: "+count;
 						})
 						.attr("fill", "white")
-						.attr("font-size", "20pt")
-						.style("text-anchor", "middle")
+						.attr("font-size", "17px")
+						.style("text-anchor", "left")
 						.style("opacity", 0.9)
-						.style("stroke", "#419261")
+						// .style("stroke", "#419261")
 						.style("stroke-width", "1px");
 					}else{
 						svg.selectAll("text").remove();
