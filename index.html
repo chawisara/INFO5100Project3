@@ -10,12 +10,7 @@
 		font-family: Helvetica;
 		font-weight: bold;
 	}
-	#fillgauge1, #fillgauge2, #fillgauge3, #fillgauge4, #fillgauge5, #fillgauge6, #fillgauge7, #fillgauge8, #fillgauge9, #fillgauge10, #fillgauge11, #fillgauge12, #fillgauge13, #fillgauge14 {
-		font-family: Helvetica;
-		font-weight: bold;
-		color: #A6BF50;
-		font-size: 20px;
-	}
+
 </style>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -70,6 +65,7 @@
 	<h2> Political Stance of the Top 10 States in Organic Product Consumption </h2>
 	<button aligh="center" type="button" class="largeButton" id="Political" onclick="showelectionData(counties)"> Election Results </button>
 	<button type="button" class="largeButton" id="reset" onclick="showOriginalMap(states)"> Reset </button>
+	<button type="button" class="largeButton" id="reset" onclick="liquidChart()"> Show Ratio of Organic Farms Per 10k Farms </button>
 	</div>
 
 	<script>
@@ -156,13 +152,13 @@
 			return{
 				States: line["States"],
 				FIPS: line["FIPS"],
-				OrganicRatio: parseFloat["% organic"]
+				OrganicRatio: parseFloat(line["% organic"])
 			}
 		}
 
 		var toptenFIPS=[];
 		var electionResults=[];
-		
+
 		d3.queue()
 		.defer(d3.json, "us.json")
 		.defer(d3.csv, "zipcode.csv", parseRowZip)
@@ -171,7 +167,7 @@
 		.defer(d3.csv, "toptenorganic.csv", parseTopTen)
 		.defer(d3.csv, "2016_US_County_Level_Presidential_Results.csv", parseElectionData)
 		.defer(d3.csv, "Total number of farms and organic farms.csv", parseNumFarms)
-		.await(function(error, USMapData, zipData, farmData, stateData, topTenData, ElectionData){
+		.await(function(error, USMapData, zipData, farmData, stateData, topTenData, ElectionData, ratioData){
 
 			states=topojson.feature(USMapData, USMapData.objects.states);
 			counties=topojson.feature(USMapData, USMapData.objects.counties);
@@ -193,7 +189,7 @@
 
 			var farms=dataPoints(zipData, stateData, farmData);
 
-			showFarmsByState(farms, stateData, states);
+			showFarmsByState(farms, stateData, states, ratioData);
 
 		});
 
@@ -223,7 +219,7 @@
 			
 			stateData.forEach(function(d){
 				var coordinates=[d.Longitude, d.Latitude];
-				var state={State: d.State, Coordinates: coordinates, FarmCount: 0, TopScope: ""};
+				var state={State: d.State, Coordinates: coordinates, FarmCount: 0, TopScope: "", Ratio: 0.0};
 				statecoordinates.push(state);
 			});
 
@@ -440,7 +436,7 @@
 		}
 
 
-		function showFarmsByState(farmData, stateData, states){
+		function showFarmsByState(farmData, stateData, states, ratioData){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
 
 			farms=farmData;
@@ -491,6 +487,13 @@
 					// if(farm.CertifiedHandling) handlingcount++;
 					// if(farm.AdditionalHandling) handlingcount++;
 				});
+
+				ratioData.forEach(function(r){
+					if(state.State==r.States){
+						state.Ratio=r.OrganicRatio;
+					}
+				});
+
 
 				state.FarmCount=count;
 				if(max<count) max=count;
@@ -803,8 +806,8 @@
 					return classname;
 				})
 				// .attr("xlink:href", "images/star/star2.png")
-				.attr("cx", function(d){return USprojection(d.Coordinates)[0];})
-				.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
+				.attr("cx", USprojection(d.Coordinates)[0])
+				.attr("cy", USprojection(d.Coordinates)[1])
 				.attr("r", 3)
 				.attr("opacity", 0.5)
 				// .attr("width", 20)
@@ -983,6 +986,53 @@
 
 		function liquidChart(){
 
+			svg.selectAll("path").remove();
+			svg.selectAll("circle").remove();
+
+			svg.append("g");
+
+			var g=svg.selectAll("g");
+
+			var count=0;
+
+			statecoordinates.forEach(function(d){
+				count++;
+
+				g.append("svg")
+				.attr("id", "fillgauge"+count)
+				.attr("width", "20%")
+				.attr("height", 250)
+				.attr("dx", function(x){return USprojection(d.Coordinates)[0];})
+				.attr("dy", function(x){return USprojection(d.Coordinates)[1];});
+
+				var gauge = loadLiquidFillGauge("fillgauge"+count, d.Ratio);
+				var config = liquidFillGaugeDefaultSettings();
+
+				config.circleThickness = 0.1;
+				config.circleColor="#A6BF50";
+				config.textColor = "#485B06";
+				config.waveTextColor = "#F5FFD2";
+				config.waveColor = "#A6BF50";
+				config.textVertPosition = 0.5;
+				config.waveAnimateTime = 1000;
+				config.waveHeight = 0.05;
+				config.waveAnimate = true;
+				config.waveRise = false;
+				config.waveHeightScaling = false;
+				config.waveOffset = 0.25;
+				config.textSize = 0.75;
+				config.waveCount = 1;
+
+				d3.select("#fillgauge"+count)
+				.append("text")
+				.attr("x", 100)
+				.attr("y", 50)
+				.text(d.State);
+
+			});
+
+			
+			
 		}
 
 
