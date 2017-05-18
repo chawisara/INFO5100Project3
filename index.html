@@ -64,9 +64,10 @@
 	</div>
 	<br>
 	<div id="political" style="float:left; margin-left:350px;">
+	<button type="button" class="largeButton" id="zoomout" onclick="zoomout()"> Zoom Out </button>
 	<h2>Compare</h2>
 	<button type="button" class="largeButton" id="Political" onclick="showelectionData(counties)">2016 Election Results of the <br>Top 10 States that Buys Organic</button>
-	<button type="button" class="largeButton" onclick="liquidChart()"> Ratio of Organic Farms <br>Per 10k Farms </button>
+	<button type="button" class="largeButton" onclick=""> Ratio of Organic Farms <br>Per 10k Farms </button>
 	<button type="button" class="largeButton" id="reset" onclick="showOriginalMap(states)"> Reset </button>
 	</div>
 
@@ -635,9 +636,12 @@
 		//code reference: https://bl.ocks.org/mbostock/2206590
 
 		function clicked(d) {
+
 			var x, y, k;
 
 			var translation;
+
+			svg.selectAll("path").remove();
 
 			if (d && centered !== d) {
 				var centroid = USpathGenerator.centroid(d);
@@ -646,42 +650,146 @@
 				k = 4;
 				centered = d;
 
-				console.log(x+" "+y);
+				var paths=svg.selectAll("path.country").data(counties.features);
+				paths.enter().append("path").attr("class", "country")
+				.merge(paths)
+				.attr("d", function (county) {
+					return USpathGenerator(county);
+				})
+				.on("click", clicked)
+				.on("mouseover", function(d){
+					this.setAttribute("style", "stroke-width: 4px");
+					this.setAttribute("cursor", "pointer");
+					//ADD HOVER
+				})
+				.on("mouseout", function(d){
+					this.setAttribute("style", "stroke-width: 1px");
+					this.setAttribute("cursor", "default");
+					//HIDE HOVER
+				});
 
 				svg.selectAll("circle")
 				.transition()
 				.duration(750)
-				.attr("r", 1.5)
+				.attr("r", 1);
 				// .attr("width", 5)
 				// .attr("height", 5);
 
-				translation=[width / 2 - x, height / 2 - y];
+				// translation=[width / 2 - x, height / 2 - y];
+				translation=[width / 2 - k*x, height / 2 - k*y];
+
 			} else {
 				x = 0;
 				y = 0;
 				k = 1;
 				centered = null;
 
+				translation=[0,0];
+
+				var paths=svg.selectAll("path.country").data(states.features);
+				paths.enter().append("path").attr("class","country")
+				.merge(paths)
+				.attr("d", function(country){
+					return USpathGenerator(country);
+				})
+				.on("mouseover", function(d){
+					this.setAttribute("style", "stroke-width: 4px");
+					this.setAttribute("cursor", "pointer");
+	                div.transition()		
+	                .duration(200)		
+	                .style("opacity", .9);		
+	            	div.html("Total number of organic farms:" + "<br/>"
+	            	 // + (d.state.FarmCount)
+	            	 )	
+	                .style("left", (d3.event.pageX - 50) + "px")		
+	                .style("top", (d3.event.pageY - 70) + "px");
+	                //ADD HOVER	
+				})
+				.on("mouseout", function(d){
+					this.setAttribute("style", "stroke-width: 1px");
+					this.setAttribute("cursor", "default");
+					div.transition()		
+	                .duration(500)		
+	                .style("opacity", 0);
+					//HIDE HOVER
+				})
+				.on("click", clicked);
+
 				svg.selectAll("circle")
 				.transition()
 				.duration(750)
-				.attr("r", 3)
+				.attr("r", 3);
 				// .attr("width", 20)
 				// .attr("height", 20);
-
-				translation=[0,0];
 			}
 
-			svg.selectAll("path")
-			.classed("active", centered && function(d) { return d === centered; });
-
-			
+			d3.selectAll("circle").moveToFront()
 
 			svg.transition()
 			.duration(750)
-			.attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
+			// .attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
+			.attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ") ")
 			.style("stroke-width", 1.5 / k + "px");
 
+
+		}
+
+		function zoomout(){
+
+			var x, y, k;
+
+			var translation;
+
+			svg.selectAll("path").remove();
+
+			var x = 0;
+			var y = 0;
+			var k = 1;
+			centered = null;
+
+			translation=[0,0];
+
+			var paths=svg.selectAll("path.country").data(states.features);
+			paths.enter().append("path").attr("class","country")
+			.merge(paths)
+			.attr("d", function(country){
+				return USpathGenerator(country);
+			})
+			.on("mouseover", function(d){
+				this.setAttribute("style", "stroke-width: 4px");
+				this.setAttribute("cursor", "pointer");
+                div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            	div.html("Total number of organic farms:" + "<br/>"
+            	 // + (d.state.FarmCount)
+            	 )	
+                .style("left", (d3.event.pageX - 50) + "px")		
+                .style("top", (d3.event.pageY - 70) + "px");
+                //ADD HOVER	
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("style", "stroke-width: 1px");
+				this.setAttribute("cursor", "default");
+				div.transition()
+                .duration(500)
+                .style("opacity", 0);
+				//HIDE HOVER
+			})
+			.on("click", clicked);
+
+			svg.selectAll("circle")
+			.transition()
+			.duration(750)
+			.attr("r", 3);
+
+			d3.selectAll("circle").moveToFront()
+
+			svg.transition()
+			.duration(750)
+			// .attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
+			.attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ") ")
+			.style("stroke-width", 1.5 / k + "px");
 
 		}
 
@@ -806,6 +914,7 @@
 					if(d.CertifiedHandling) classname+=" CertifiedHandling";
 					if(d.CertifiedLivestock) classname+=" CertifiedLivestock";
 					if(d.CertifiedWildCrops) classname+=" CertifiedWildCrops";
+					classname+=" farm";
 					return classname;
 				})
 				// .attr("xlink:href", "images/star/star2.png")
@@ -846,6 +955,7 @@
 				if(d.CertifiedHandling) classname+=" CertifiedHandling";
 				if(d.CertifiedLivestock) classname+=" CertifiedLivestock";
 				if(d.CertifiedWildCrops) classname+=" CertifiedWildCrops";
+				classname+=" farm";
 				return classname;
 			})
 			// .attr("xlink:href", "images/star/star2.png")
@@ -929,7 +1039,7 @@
 						if(farm.CertifiedHandling) classname+=" CertifiedHandling";
 						if(farm.CertifiedLivestock) classname+=" CertifiedLivestock";
 						if(farm.CertifiedWildCrops) classname+=" CertifiedWildCrops";
-						classname+=" animating";
+						classname+=" farm animating";
 						return classname;
 					})
 					// .attr("xlink:href", "images/star/star2.png")
@@ -987,64 +1097,79 @@
 			}, 500);
 		}
 
-		function liquidChart(){
+		d3.selection.prototype.moveToBack = function() {
+	        return this.each(function() {
+	            var firstChild = this.parentNode.firstChild;
+	            if (firstChild) {
+	                this.parentNode.insertBefore(this, firstChild);
+	            }
+	        });
+	    };
 
-			svg.selectAll("path").remove();
-			svg.selectAll("circle").remove();
+	    d3.selection.prototype.moveToFront = function() {
+			return this.each(function(){
+				this.parentNode.appendChild(this);
+			});
+		};
 
-			svg.append("g")
-			.attr("width", 1100)
-			.attr("height", 650);
+		// function liquidChart(){
 
-			var g=svg.selectAll("g");
+		// 	svg.selectAll("path").remove();
+		// 	svg.selectAll("circle").remove();
 
-			var count=0;
+		// 	svg.append("g")
+		// 	.attr("width", 1100)
+		// 	.attr("height", 650);
 
-			statecoordinates.forEach(function(d){
-				count++;
+		// 	var g=svg.selectAll("g");
 
-				g.append("svg")
-				.attr("id", "fillgauge"+count)
-				.attr("width", "20%")
-				.attr("height", 250)
-				.attr("dx", USprojection(d.Coordinates)[0])
-				.attr("dy", USprojection(d.Coordinates)[1])
-				.style("font-family","Helvetica")
-				.style("font-weight", "bold")
-				.style("color", "#A6BF50")
-				.style("font-size", 20);
+		// 	var count=0;
 
-				var config = liquidFillGaugeDefaultSettings();
+		// 	statecoordinates.forEach(function(d){
+		// 		count++;
 
-				config.circleThickness = 0.1;
-				config.circleColor="#A6BF50";
-				config.textColor = "#485B06";
-				config.waveTextColor = "#F5FFD2";
-				config.waveColor = "#A6BF50";
-				config.textVertPosition = 0.5;
-				config.waveAnimateTime = 1000;
-				config.waveHeight = 0.05;
-				config.waveAnimate = true;
-				config.waveRise = false;
-				config.waveHeightScaling = false;
-				config.waveOffset = 0.25;
-				config.textSize = 0.75;
-				config.waveCount = 1;
+		// 		g.append("svg")
+		// 		.attr("id", "fillgauge"+count)
+		// 		.attr("width", "20%")
+		// 		.attr("height", 250)
+		// 		.attr("dx", USprojection(d.Coordinates)[0])
+		// 		.attr("dy", USprojection(d.Coordinates)[1])
+		// 		.style("font-family","Helvetica")
+		// 		.style("font-weight", "bold")
+		// 		.style("color", "#A6BF50")
+		// 		.style("font-size", 20);
 
-				var gauge = loadLiquidFillGauge("fillgauge"+count, d.Ratio, config);
+		// 		var config = liquidFillGaugeDefaultSettings();
+
+		// 		config.circleThickness = 0.1;
+		// 		config.circleColor="#A6BF50";
+		// 		config.textColor = "#485B06";
+		// 		config.waveTextColor = "#F5FFD2";
+		// 		config.waveColor = "#A6BF50";
+		// 		config.textVertPosition = 0.5;
+		// 		config.waveAnimateTime = 1000;
+		// 		config.waveHeight = 0.05;
+		// 		config.waveAnimate = true;
+		// 		config.waveRise = false;
+		// 		config.waveHeightScaling = false;
+		// 		config.waveOffset = 0.25;
+		// 		config.textSize = 0.75;
+		// 		config.waveCount = 1;
+
+		// 		var gauge = loadLiquidFillGauge("fillgauge"+count, d.Ratio, config);
 				
 
-				d3.select("#fillgauge"+count)
-				.append("text")
-				.attr("x", 100)
-				.attr("y", 50)
-				.text(d.State);
+		// 		d3.select("#fillgauge"+count)
+		// 		.append("text")
+		// 		.attr("x", 100)
+		// 		.attr("y", 50)
+		// 		.text(d.State);
 
-			});
+		// 	});
 
 			
 			
-		}
+		//}
 
 
 
