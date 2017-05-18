@@ -55,6 +55,10 @@ path {
 	position:relative;
 	top:1px;
 }
+
+.topFiveText {
+	font-size: 16pt;
+}
 	
 #political {
 	color:white; 

@@ -412,11 +412,11 @@
 			d3.select("#top5svg").remove();
 
 			var svg = d3.select("#topProducts").append("svg")
-						.attr("id", "top5svg").attr("width", 1100).attr("height", 160);
+						.attr("id", "top5svg").attr("width", 1100).attr("height", 180);
 
 			svg.append("text")
 				.attr("x", 1100 / 2 - 80)
-				.attr("dy", "2em")
+				.attr("dy", "1em")
 				.attr("class", "topFiveText")
 				.style("fill", "white")
 				.text("Top Five Products under This Scope");
@@ -431,7 +431,7 @@
 			imgs.enter()
 				.append("svg:image")
 				.attr("width", 100)
-				.attr("height", 120)
+				.attr("height", 130)
 				.attr("xlink:href", function(d) {return d;})
 				.attr("y", 30)
 				.attr("x", function(d,i) {return i * 160 + 200;})
