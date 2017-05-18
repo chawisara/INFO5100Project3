@@ -88,6 +88,17 @@
 		var div = d3.select("body").append("div")	
 		    .attr("class", "tooltip")				
 		    .style("opacity", 0);
+
+		
+		$("#datepicker").datepicker({
+			changeMonth: true,
+			changeYear: true,
+			showButtonPanel: true,
+			yearRange: '1975:2017',
+			maxDate: new Date(),
+			minDate: new Date(1975, 7, 31)
+		});
+
 		var parseRowZip = function(line) {
 			return{
 				Zipcode: line["Zipcode"],
@@ -193,6 +204,7 @@
 			showFarmsByState(farms, stateData, states, ratioData);
 
 		});
+
 
 		// var zips = [];
 		var statecoordinates=[];
@@ -771,15 +783,6 @@
 		}
 
 
-		$("#datepicker").datepicker({
-			changeMonth: true,
-			changeYear: true,
-			showButtonPanel: true,
-			yearRange: '1975:2017',
-			maxDate: new Date(),
-			minDate: new Date(1975, 7, 31)
-		});
-
 		function dateFilter(inputDate){
 			if(inputDate==""){
 				showAllFarms();
@@ -803,8 +806,8 @@
 					return classname;
 				})
 				// .attr("xlink:href", "images/star/star2.png")
-				.attr("cx", USprojection(d.Coordinates)[0])
-				.attr("cy", USprojection(d.Coordinates)[1])
+				.attr("cx", function(d){return USprojection(d.Coordinates)[0];})
+				.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
 				.attr("r", 3)
 				.attr("opacity", 0.5)
 				// .attr("width", 20)
@@ -986,7 +989,9 @@
 			svg.selectAll("path").remove();
 			svg.selectAll("circle").remove();
 
-			svg.append("g");
+			svg.append("g")
+			.attr("width", 1100)
+			.attr("height", 650);
 
 			var g=svg.selectAll("g");
 
@@ -999,10 +1004,13 @@
 				.attr("id", "fillgauge"+count)
 				.attr("width", "20%")
 				.attr("height", 250)
-				.attr("dx", function(x){return USprojection(d.Coordinates)[0];})
-				.attr("dy", function(x){return USprojection(d.Coordinates)[1];});
+				.attr("dx", USprojection(d.Coordinates)[0])
+				.attr("dy", USprojection(d.Coordinates)[1])
+				.style("font-family","Helvetica")
+				.style("font-weight", "bold")
+				.style("color", "#A6BF50")
+				.style("font-size", 20);
 
-				var gauge = loadLiquidFillGauge("fillgauge"+count, d.Ratio);
 				var config = liquidFillGaugeDefaultSettings();
 
 				config.circleThickness = 0.1;
@@ -1019,6 +1027,9 @@
 				config.waveOffset = 0.25;
 				config.textSize = 0.75;
 				config.waveCount = 1;
+
+				var gauge = loadLiquidFillGauge("fillgauge"+count, d.Ratio, config);
+				
 
 				d3.select("#fillgauge"+count)
 				.append("text")
