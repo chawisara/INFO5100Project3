@@ -383,11 +383,13 @@
 			.on("mouseover", function(d){
 				this.setAttribute("style", "stroke-width: 4px");
 				this.setAttribute("cursor", "pointer");
+				this.setAttribute("tooltip", "d.State.FarmCount");
 				//ADD HOVER
 			})
 			.on("mouseout", function(d){
 				this.setAttribute("style", "stroke-width: 1px");
 				this.setAttribute("cursor", "default");
+				this.removeAttribute("tooltip");
 				//HIDE HOVER
 			})
 			.on("click", clicked);

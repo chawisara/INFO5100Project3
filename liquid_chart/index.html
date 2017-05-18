@@ -10,6 +10,12 @@
 			font-family: Helvetica;
 			font-weight: bold;
 		}
+        #fillgauge1, #fillgauge2, #fillgauge3, #fillgauge4, #fillgauge5, #fillgauge6, #fillgauge7, #fillgauge8, #fillgauge9, #fillgauge10, #fillgauge11, #fillgauge12, #fillgauge13, #fillgauge14 {
+            font-family: Helvetica;
+            font-weight: bold;
+            color: #A6BF50;
+            font-size: 20px;
+        }
 	</style>
 </head>
 <body>
@@ -19,40 +25,89 @@
 <svg id="fillgauge4" width="20%" height="250"></svg>
 <svg id="fillgauge5" width="20%" height="250"></svg>
 <svg id="fillgauge6" width="20%" height="250"></svg>
+<svg id="fillgauge7" width="20%" height="250"></svg>
+<svg id="fillgauge8" width="20%" height="250"></svg>
+<svg id="fillgauge9" width="20%" height="250"></svg>
+<svg id="fillgauge10" width="20%" height="250"></svg>
+<svg id="fillgauge11" width="20%" height="250"></svg>
+<svg id="fillgauge12" width="20%" height="250"></svg>
 
 <script language="JavaScript">
-	var gauge1 = loadLiquidFillGauge("fillgauge1", 3.6);
-	var config1 = liquidFillGaugeDefaultSettings();
-	config1.circleColor="#A6BF50";
-	config1.textColor = "#FF4444";
-	config1.waveTextColor = "#FFAAAA";
+	//Alabama
+    var gauge1 = loadLiquidFillGauge("fillgauge1", 6.5);
+	var config1 = liquidFillGaugeDefaultSettings()
+                    d3.select("#fillgauge1")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("Alabama");
+    //Alaska                    
+	config1.circleThickness = 0.1;
+    config1.circleColor="#A6BF50";
+	config1.textColor = "#485B06";
+	config1.waveTextColor = "#F5FFD2";
 	config1.waveColor = "#A6BF50";
-	config1.circleThickness = 0.2;
-	config1.textVertPosition = 0.2;
-	config1.waveAnimateTime = 5000;
-	var gauge2 = loadLiquidFillGauge("fillgauge2", 2);
-	var config2 = liquidFillGaugeDefaultSettings();
-	config2.circleColor = "#A6BF50";
-	config2.textColor = "#553300";
-	config2.waveTextColor = "#805615";
-	config2.waveColor = "#A6BF50";
-    config2.circleThickness = 0.1;
-    config2.circleFillGap = 0.2;
+	config1.textVertPosition = 0.5;
+	config1.waveAnimateTime = 1000;
+    config1.waveHeight = 0.05;
+    config1.waveAnimate = true;
+    config1.waveRise = false;
+    config1.waveHeightScaling = false;
+    config1.waveOffset = 0.25;
+    config1.textSize = 0.75;
+    config1.waveCount = 1;
+    var gauge2 = loadLiquidFillGauge("fillgauge2", 223, config1);
+	var config2 = liquidFillGaugeDefaultSettings()
+                        d3.select("#fillgauge2")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("Alaska");
+    //Arizona                    
+	config2.circleThickness = 0.1;
+    config2.circleColor = "#A6BF50";
+    config2.textColor = "#485B06";
+    config2.waveTextColor = "#F5FFD2";
+    config2.waveColor = "#A6BF50";
     config2.textVertPosition = 0.5;
-    config2.waveAnimateTime = 2000;
-    config2.waveHeight = 0.3;
+    config2.waveAnimateTime = 1000;
+    config2.waveHeight = 0.05;
+    config2.waveAnimate = true;
+    config2.waveRise = false;
+    config2.waveHeightScaling = false;
+    config2.waveOffset = 0.25;
+    config2.textSize = 0.75;
     config2.waveCount = 1;
-    var gauge3 = loadLiquidFillGauge("fillgauge3", 0.6, config2);
-    var config3 = liquidFillGaugeDefaultSettings();
+    var gauge3 = loadLiquidFillGauge("fillgauge3", 2.8, config2);
+    var config3 = liquidFillGaugeDefaultSettings()
+                        d3.select("#fillgauge3")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("Arizona");
+    //Arkansas
+    config3.circleThickness = 0.1;
+    config3.circleColor = "#A6BF50";
+    config3.textColor = "#485B06";
+    config3.waveTextColor = "#F5FFD2";
+    config3.waveColor = "#A6BF50";
     config3.textVertPosition = 0.5;
-    config3.waveAnimateTime = 5000;
-    config3.waveHeight = 0.15;
-    config3.waveAnimate = false;
+    config3.waveAnimateTime = 1000;
+    config3.waveHeight = 0.05;
+    config3.waveAnimate = true;
+    config3.waveRise = false;
+    config3.waveHeightScaling = false;
     config3.waveOffset = 0.25;
-    config3.valueCountUp = false;
-    config3.displayPercent = false;
-    var gauge4 = loadLiquidFillGauge("fillgauge4", 50, config3);
-    var config4 = liquidFillGaugeDefaultSettings();
+    config3.textSize = 0.75;
+    config3.waveCount = 1;
+    var gauge4 = loadLiquidFillGauge("fillgauge4", 7.5, config3);
+    var config4 = liquidFillGaugeDefaultSettings()
+                        d3.select("#fillgauge4")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("Arkansas");
+    //California
     config4.circleThickness = 0.1;
     config4.circleColor = "#A6BF50";
     config4.textColor = "#485B06";
@@ -66,25 +121,82 @@
     config4.waveHeightScaling = false;
     config4.waveOffset = 0.25;
     config4.textSize = 0.75;
-    config4.waveCount = 3;
-    var gauge5 = loadLiquidFillGauge("fillgauge5", 60.44, config4);
-    var config5 = liquidFillGaugeDefaultSettings();
+    config4.waveCount = 1;
+    var gauge5 = loadLiquidFillGauge("fillgauge5", 360, config4);
+    var config5 = liquidFillGaugeDefaultSettings()
+                        d3.select("#fillgauge5")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("California");
+    //Colorado
     config5.circleThickness = 0.1;
     config5.circleColor = "#A6BF50";
     config5.textColor = "#485B06";
     config5.waveTextColor = "#F5FFD2";
     config5.waveColor = "#A6BF50";
     config5.textVertPosition = 0.5;
-    config5.waveAnimateTime = 5000;
-    config5.waveHeight = 0;
+    config5.waveAnimateTime = 1000;
+    config5.waveHeight = 0.05;
     config5.waveAnimate = true;
-    config5.waveCount = 2;
+    config5.waveRise = false;
+    config5.waveHeightScaling = false;
     config5.waveOffset = 0.25;
-    config5.textSize = 1.2;
-    config5.minValue = 30;
-    config5.maxValue = 150
-    config5.displayPercent = false;
-    var gauge6 = loadLiquidFillGauge("fillgauge6", 120, config5);
+    config5.textSize = 0.75;
+    config5.waveCount = 1;
+    var gauge6 = loadLiquidFillGauge("fillgauge6", 43, config5);
+    var config6 = liquidFillGaugeDefaultSettings()
+                        d3.select("#fillgauge6")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("Colorado");
+
+    //Connecticut
+    config6.circleThickness = 0.1;
+    config6.circleColor = "#A6BF50";
+    config6.textColor = "#485B06";
+    config6.waveTextColor = "#F5FFD2";
+    config6.waveColor = "#A6BF50";
+    config6.textVertPosition = 0.5;
+    config6.waveAnimateTime = 1000;
+    config6.waveHeight = 0.05;
+    config6.waveAnimate = true;
+    config6.waveRise = false;
+    config6.waveHeightScaling = false;
+    config6.waveOffset = 0.25;
+    config6.textSize = 0.75;
+    config6.waveCount = 1;
+    var gauge7 = loadLiquidFillGauge("fillgauge7", 204, config6);
+    var config7 = liquidFillGaugeDefaultSettings()
+                        d3.select("#fillgauge7")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("Connecticut");
+
+    //Delaware
+    config7.circleThickness = 0.1;
+    config7.circleColor = "#A6BF50";
+    config7.textColor = "#485B06";
+    config7.waveTextColor = "#F5FFD2";
+    config7.waveColor = "#A6BF50";
+    config7.textVertPosition = 0.5;
+    config7.waveAnimateTime = 1000;
+    config7.waveHeight = 0.05;
+    config7.waveAnimate = true;
+    config7.waveRise = false;
+    config7.waveHeightScaling = false;
+    config7.waveOffset = 0.25;
+    config7.textSize = 0.75;
+    config7.waveCount = 1;
+    var gauge8 = loadLiquidFillGauge("fillgauge8", 40.7, config7);
+    var config8 = liquidFillGaugeDefaultSettings()
+                        d3.select("#fillgauge8")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("Delaware");
 
     function NewValue() {
     	if (Math.random() > .5) {
