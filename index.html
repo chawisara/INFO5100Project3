@@ -406,7 +406,7 @@
 			d3.select("#top5svg").remove();
 
 			var svg = d3.select("#topProducts").append("svg")
-						.attr("id", "top5svg").attr("width", 1100).attr("height", 140);
+						.attr("id", "top5svg").attr("width", 1100).attr("height", 160);
 
 			svg.append("text")
 				.attr("x", 1100 / 2 - 80)
@@ -734,6 +734,8 @@
 			.on("mouseout", function(d){
 				this.setAttribute("opacity", 0);
 			});
+
+			plotTop5(top5wildcrops);
 		}
 
 		function handling_clicked(){
@@ -752,6 +754,8 @@
 			.on("mouseout", function(d){
 				this.setAttribute("opacity", 0);
 			});
+
+			plotTop5(top5handling);
 		}
 
 		function showAll_clicked(){
