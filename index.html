@@ -43,13 +43,14 @@
 }
 </style>
 <body>
-	<h1>Where Are the Organic Farms in the U.S.?</h1>
+	<h1>Where Are the USDA Certified Organic Farms in the U.S.?</h1>
 	<br>
 	<div id="topProducts"></div>
 	<div><svg id="map" height="650" width="1100">
 	</svg></div>
 	<br><br>
 	<div id="buttons">
+		<p>farms by certified scopes</p>
 		<button id="crops" style="cursor:pointer; background-color: transparent; border-color: transparent;"><img src="images/scopes/crop.png" height="100"/></button>
 		<button id="livestock" style="cursor:pointer; background-color: transparent; border-color: transparent;"><img src="images/scopes/livestock.png" height="100"/></button>
 		<button id="wildcrops" style="cursor:pointer; background-color: transparent; border-color: transparent;"><img src="images/scopes/wild_crop.png" height="100"/></button>
@@ -57,7 +58,7 @@
 		<button id="showAll" style="cursor:pointer; background-color: transparent; border-color: transparent;"><img src="images/scopes/view_all.png" height="100"/></button>
 	</div>
 	<br>
-	<div id="date">
+	<div id="date" style="float:right;">
 	<p>farms by specific date</p>
 	<form onreset="showAllFarms()">
 		<input type="text" id="datepicker" onchange="dateFilter(this.value)">
