@@ -2,8 +2,7 @@
 
 <head>
 <title>INFO 5100: Project 3 - Master Capstone</title>
-<link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+<link href="https://fonts.googleapis.com/css?family=Muli:400,800,900|Raleway:400,800|Roboto" rel="stylesheet">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="styles.css">
 <style>
@@ -35,16 +34,20 @@
 		<button id="showAll" style="cursor:pointer; background-color: transparent; border-color: transparent;"><img src="images/scopes/view_all.png" height="100"/></button>
 	</div>
 	<br>
+	<div id="date">
+	<p>farms by specific date</p>
 	<form onreset="showAllFarms()">
 		<input type="text" id="datepicker" onchange="dateFilter(this.value)">
-		<input type="reset" value="Clear" >
+		<input type="reset" id="cleardate" value="Clear" >
 	</form>
-	<div id="political">
-	<p> Click the Political v. Top 10 button to look at the top 10 states in organic sales and each of their county's political outcome from the 2016 election.</p>
-	<button type="button" class="largeButton" id="Political" onclick="showelectionData(counties)"> Political v. Top 10 States in Organic Sales </button>
 	</div>
 	<br>
-	<button type="button" class="largeButton" id="reset" onclick="showOriginalMap(states)"> Reset Map </button>
+	<div id="political">
+	<h2> Political Stance of the Top 10 States in Organic Product Consumption </h2>
+	<button aligh="center" type="button" class="largeButton" id="Political" onclick="showelectionData(counties)"> Election Results </button>
+	<button type="button" class="largeButton" id="reset" onclick="showOriginalMap(states)"> Reset </button>
+	</div>
+
 	<script>
 		var svg = d3.select("#map");
 		var width=1100;
@@ -459,14 +462,9 @@
 				for (i=0; i < electionResults.length; i++){
 					if (d.id == electionResults[i].FIPS) {
 						if (electionResults[i].Dem > electionResults[i].GOP){
-							//console.log("DEM")
-							//console.log(electionResults[i].Dem)
 							return colorBlue(electionResults[i].Dem)
 						} else {
-							//console.log("GOP")
-							//console.log(electionResults[i].Dem)
 							return colorRed(electionResults[i].GOP);
-						// }
 						}
 					}
 				}
@@ -496,7 +494,6 @@
 			.attr("d", function(country){
 				return USpathGenerator(country);
 			})
-			.style("fill", "#454545")
 			.on("mouseover", function(d){
 				this.setAttribute("style", "stroke-width: 4px");
 				this.setAttribute("cursor", "pointer");
@@ -758,13 +755,12 @@
 			svg.append("text")
 			.attr("id", "skip")
 			.attr("x", 650)
-			.attr("y", 630)
-			.text("[ Skip ]")
+			.attr("y", 640)
+			.text("skip animation")
 			.attr("fill", "white")
-			.attr("font-size", "20pt")
+			.attr("font-size", "12pt")
 			.style("text-anchor", "middle")
-			.style("opacity", 0.9)
-			// .style("stroke", "#419261")
+			.style("opacity", 0.7)
 			.style("stroke-width", "1px")
 			.on("mouseover", function(d){
 				this.setAttribute("cursor", "pointer");
