@@ -171,7 +171,7 @@
     var config7 = liquidFillGaugeDefaultSettings()
                         d3.select("#fillgauge7")
                         .append("text")
-                        .attr("x", 100)
+                        .attr("x", 90)
                         .attr("y", 50)
                         .text("Connecticut");
 
@@ -197,6 +197,29 @@
                         .attr("x", 100)
                         .attr("y", 50)
                         .text("Delaware");
+
+    //Florida
+    config8.circleThickness = 0.1;
+    config8.circleColor = "#A6BF50";
+    config8.textColor = "#485B06";
+    config8.waveTextColor = "#F5FFD2";
+    config8.waveColor = "#A6BF50";
+    config8.textVertPosition = 0.5;
+    config8.waveAnimateTime = 1000;
+    config8.waveHeight = 0.05;
+    config8.waveAnimate = true;
+    config8.waveRise = false;
+    config8.waveHeightScaling = false;
+    config8.waveOffset = 0.25;
+    config8.textSize = 0.75;
+    config8.waveCount = 1;
+    var gauge9 = loadLiquidFillGauge("fillgauge9", 34.8, config8);
+    var config9 = liquidFillGaugeDefaultSettings()
+                        d3.select("#fillgauge9")
+                        .append("text")
+                        .attr("x", 100)
+                        .attr("y", 50)
+                        .text("Florida");
 
     function NewValue() {
     	if (Math.random() > .5) {
