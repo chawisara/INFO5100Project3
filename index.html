@@ -46,7 +46,7 @@
 	<h1>Where Are the Organic Farms in the U.S.?</h1>
 	<br>
 	<div id="topProducts"></div>
-	<div><svg id="map" height="800" width="1100">
+	<div><svg id="map" height="650" width="1100">
 	</svg></div>
 	<br><br>
 	<div id="buttons">
@@ -403,6 +403,8 @@
 		
 
 		function plotTop5(array) {
+			d3.select("#top5svg").remove();
+
 			var svg = d3.select("#topProducts").append("svg")
 						.attr("id", "top5svg").attr("width", 1100).attr("height", 140);
 
@@ -712,6 +714,8 @@
 			.on("mouseout", function(d){
 				this.setAttribute("opacity", 0);
 			});
+
+			plotTop5(top5livestock);
 		}
 
 		function wildcrops_clicked(){
