@@ -545,6 +545,16 @@
 				y = centroid[1];
 				k = 4;
 				centered = d;
+
+				console.log(x+" "+y);
+
+				svg.transition()
+				.duration(750)
+				.attr("transform", "translate(" + -x + "," + -y + ") scale(" + k + ")")
+				.style("stroke-width", 1.5 / k + "px");
+
+				console.log("zoom");
+
 				svg.selectAll("image")
 				.transition()
 				.duration(750)
@@ -555,6 +565,12 @@
 				y = height / 2;
 				k = 1;
 				centered = null;
+				
+				svg.transition()
+				.duration(750)
+				.attr("transform", "translate(" + x + "," + y + ") scale(" + k + ")")
+				.style("stroke-width", 1.5 / k + "px");
+
 				svg.selectAll("image")
 				.transition()
 				.duration(750)
@@ -562,13 +578,9 @@
 				.attr("height", 20);
 			}
 
-			svg.selectAll("path")
-			.classed("active", centered && function(d) { return d === centered; });
+			// svg.selectAll("path")
+			// .classed("active", centered && function(d) { return d === centered; });
 
-			svg.transition()
-			.duration(750)
-			.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
-			.style("stroke-width", 1.5 / k + "px");
 
 		}
 
@@ -865,7 +877,7 @@
 					
 				}
 
-			}, 10);
+			}, 500);
 		}
 
 
