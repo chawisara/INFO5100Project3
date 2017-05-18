@@ -556,7 +556,7 @@
 				.attr("width", 5)
 				.attr("height", 5);
 
-				translation=[width / 2 - k * x, height / 2 - k * y];
+				translation=[width / 2 - x, height / 2 - y];
 			} else {
 				x = 0;
 				y = 0;
@@ -579,7 +579,7 @@
 
 			svg.transition()
 			.duration(750)
-			.attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ")")
+			.attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
 			.style("stroke-width", 1.5 / k + "px");
 
 
