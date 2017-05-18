@@ -367,7 +367,8 @@
 		
 
 		function plotTop5(array) {
-			var svg = d3.select("#topProducts").append("svg").attr("width", 1100).attr("height", 140);
+			var svg = d3.select("#topProducts").append("svg")
+						.attr("id", "top5svg").attr("width", 1100).attr("height", 140);
 
 			svg.append("text")
 				.attr("x", 1100 / 2 - 80)
@@ -706,6 +707,7 @@
 			.on("mouseout", function(d){
 				this.setAttribute("opacity", 0.5);
 			});
+			d3.select("#top5svg").remove();
 		}
 
 
