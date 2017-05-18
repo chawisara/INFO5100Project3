@@ -539,6 +539,8 @@
 		function clicked(d) {
 			var x, y, k;
 
+			var translation;
+
 			if (d && centered !== d) {
 				var centroid = USpathGenerator.centroid(d);
 				x = centroid[0];
@@ -548,38 +550,37 @@
 
 				console.log(x+" "+y);
 
-				svg.transition()
-				.duration(750)
-				.attr("transform", "translate(" + -x + "," + -y + ") scale(" + k + ")")
-				.style("stroke-width", 1.5 / k + "px");
-
-				console.log("zoom");
-
 				svg.selectAll("image")
 				.transition()
 				.duration(750)
 				.attr("width", 5)
 				.attr("height", 5);
+
+				translation=[width / 2 - k * x, height / 2 - k * y];
 			} else {
-				x = width / 2;
-				y = height / 2;
+				x = 0;
+				y = 0;
 				k = 1;
 				centered = null;
-				
-				svg.transition()
-				.duration(750)
-				.attr("transform", "translate(" + x + "," + y + ") scale(" + k + ")")
-				.style("stroke-width", 1.5 / k + "px");
 
 				svg.selectAll("image")
 				.transition()
 				.duration(750)
 				.attr("width", 20)
 				.attr("height", 20);
+
+				translation=[0,0];
 			}
 
-			// svg.selectAll("path")
-			// .classed("active", centered && function(d) { return d === centered; });
+			svg.selectAll("path")
+			.classed("active", centered && function(d) { return d === centered; });
+
+			
+
+			svg.transition()
+			.duration(750)
+			.attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ")")
+			.style("stroke-width", 1.5 / k + "px");
 
 
 		}
