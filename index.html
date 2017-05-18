@@ -21,10 +21,9 @@
 <body>
 	<h1>Where Are the Organic Farms in the U.S.?</h1>
 	<br>
-	<div id="top products" style="margin:auto;"></div>
-	<br>
-	<svg id="map" height="650" width="1100">
-	</svg>
+	<div id="topProducts"></div>
+	<div><svg id="map" height="800" width="1100">
+	</svg></div>
 	<br><br>
 	<div id="buttons">
 		<button id="crops" style="cursor:pointer; background-color: transparent; border-color: transparent;"><img src="images/scopes/crop.png" height="100"/></button>
@@ -365,9 +364,41 @@
 
 		}
 
+		
+
+		function plotTop5(array) {
+			var svg = d3.select("#topProducts").append("svg").attr("width", 1100).attr("height", 140);
+
+			svg.append("text")
+				.attr("x", 1100 / 2 - 80)
+				.attr("dy", "2em")
+				.attr("class", "topFiveText")
+				.style("fill", "white")
+				.text("Top Five Products under This Scope");
+
+			var imageList = [];
+
+			array.forEach(function(d) {
+				imageList.push("/images/top5/" + d + ".png");
+			});
+
+			var imgs = svg.selectAll("image").data(imageList);
+			imgs.enter()
+				.append("svg:image")
+				.attr("width", 100)
+				.attr("height", 120)
+				.attr("xlink:href", function(d) {return d;})
+				.attr("y", 30)
+				.attr("x", function(d,i) {return i * 160 + 200;})
+				.attr("class", "topFive");
+
+		}
+
+
 		function getZipCoordinate(zipCode) {
 			return zipsObject[zipCode];
 		}
+
 
 		function showFarmsByState(farmData, stateData, states){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
@@ -436,6 +467,7 @@
 
 		}
 
+
 		function showelectionData(counties){
 
 			var colorBlue = d3.scaleLinear().domain([0.0, 0.33, 0.66, 1.0]).range(["#FFFFFF","#85C6FF","#0A8DFF","#002C52"]);
@@ -475,9 +507,7 @@
 
 			svg.selectAll("image").remove();
 
-			showAllFarms();
-
-			
+			showAllFarms();	
 
 		}
 
@@ -585,11 +615,14 @@
 
 		}
 
-		d3.select("#crops").on("click", crops_clicked);
+
+		d3.select("#crops")
+		.on("click", crops_clicked);
 		d3.select("#livestock").on("click", livestock_clicked);
 		d3.select("#wildcrops").on("click", wildcrops_clicked);
 		d3.select("#handling").on("click", handling_clicked);
 		d3.select("#showAll").on("click", showAll_clicked);
+
 
 		function crops_clicked(){
 			d3.selectAll("image").style("opacity", 0.5)
@@ -607,6 +640,8 @@
 			.on("mouseout", function(d){
 				this.setAttribute("opacity", 0);
 			});
+
+			plotTop5(top5crops);
 		}
 
 		function livestock_clicked(){
@@ -723,6 +758,7 @@
 			}
 
 		}
+
 
 		function showAllFarms(){
 			svg.selectAll("image").remove();
@@ -880,6 +916,7 @@
 
 			}, 500);
 		}
+
 
 
 	</script>

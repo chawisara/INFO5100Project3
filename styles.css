@@ -55,12 +55,12 @@ path {
 	position:relative;
 	top:1px;
 }
-
 	
 #political {
 	color:white; 
 	font-size: 10pt;
 	text-align: center;
+	margin-bottom: 40px;
 }
 
 #date {
@@ -83,3 +83,5 @@ path {
 	text-shadow:0px 1px 0px #2b665e;
 	text-align: right;
 }
+
+
