@@ -784,18 +784,18 @@
 					return farmDate<=input && farmDate>=minDate;
 				}))
 				.enter().append("circle")
-				.attr("id", function(d){return farm.OperationName;})
+				.attr("id", function(d){return d.OperationName;})
 				.attr("class", function(d){
 					var classname="";
-					if(farm.CertifiedCrops) classname="CertifiedCrops";
-					if(farm.CertifiedHandling) classname+=" CertifiedHandling";
-					if(farm.CertifiedLivestock) classname+=" CertifiedLivestock";
-					if(farm.CertifiedWildCrops) classname+=" CertifiedWildCrops";
+					if(d.CertifiedCrops) classname="CertifiedCrops";
+					if(d.CertifiedHandling) classname+=" CertifiedHandling";
+					if(d.CertifiedLivestock) classname+=" CertifiedLivestock";
+					if(d.CertifiedWildCrops) classname+=" CertifiedWildCrops";
 					return classname;
 				})
 				// .attr("xlink:href", "images/star/star2.png")
-				.attr("cx", function(d){return USprojection(farm.Coordinates)[0];})
-				.attr("cy", function(d){return USprojection(farm.Coordinates)[1];})
+				.attr("cx", function(d){return USprojection(d.Coordinates)[0];})
+				.attr("cy", function(d){return USprojection(d.Coordinates)[1];})
 				.attr("r", 3)
 				.attr("opacity", 0.5)
 				// .attr("width", 20)
