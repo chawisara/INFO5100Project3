@@ -42,7 +42,7 @@ path {
 	display:inline-block;
 	cursor:pointer;
 	color:#ffffff;
-	font-size:12px;
+	font-size:14px;
 	padding:8px 15px;
 	text-decoration:none;
 	text-shadow:0px 1px 0px #2b665e;
@@ -58,9 +58,8 @@ path {
 	
 #political {
 	color:white; 
-	font-size: 10pt;
 	text-align: center;
-	margin-bottom: 40px;
+	margin-bottom: 10px;
 }
 
 #date {
