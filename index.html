@@ -61,7 +61,7 @@
 	</form>
 	</div>
 	<br>
-	<div id="political">
+	<div id="political" style="float:left; margin-left:200px;">
 	<h2> Political Stance of the Top 10 States in Organic Product Consumption </h2>
 	<button aligh="center" type="button" class="largeButton" id="Political" onclick="showelectionData(counties)"> Election Results </button>
 	<button type="button" class="largeButton" id="reset" onclick="showOriginalMap(states)"> Reset </button>
@@ -303,10 +303,6 @@
 			});
 
 			findTop5();
-			console.log(top5crops);
-			console.log(top5livestock);
-			console.log(top5wildcrops);
-			console.log(top5handling);
 
 			return points;
 		}
