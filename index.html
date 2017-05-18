@@ -106,7 +106,7 @@
 				Zipcode: line["Zipcode"],
 				City: line["City"],
 				State: line["State"],
-				County: line["County"],
+				// County: line["County"],
 				Latitude: Number(line["Lat"]),
 				Longitude: Number(line["Long"])
 			}
@@ -217,7 +217,7 @@
 		var top5livestock=[];
 		var top5wildcrops=[];
 		var top5handling=[];
-		var counties={};
+		// var counties={};
 
 		var allCrops={};
 		var allLivestock={};
@@ -228,14 +228,12 @@
 		function dataPoints(zipData, stateData, farmData){
 			var points = [];
 
-
-
 			zipData.forEach(function(d){
 				var coordinates=[d.Longitude, d.Latitude];
 				// var zip={Zipcode: d.Zipcode, Coordinates: coordinates};
 				// zips.push(zip);
 				zipsObject[d.Zipcode] = coordinates;
-				counties[d.Zipcode] = d.County;
+				// counties[d.Zipcode] = d.County;
 			});
 			
 			stateData.forEach(function(d){
@@ -252,14 +250,14 @@
 				}
 
 				var farmCoordinates = getZipCoordinate(data.AddressZip);
-				var county=getCounty(data.AddressZip);
+				// var county=getCounty(data.AddressZip);
 
 				if(farmCoordinates!=undefined){
 					var point={CertifierName: data.CertifierName, OperationID: data.OperationID, OperationName: data.OperationName, CertificationStatus: data.CertificationStatus,
 					DateOfStatus: data.DateOfStatus, CertifiedCrops: data.CertifiedCrops, AdditionalCrops: data.AdditionalCrops, CertifiedLivestock: data.CertifiedLivestock,
 					AdditionalLivestock: data.AdditionalLivestock, CertifiedWildCrops: data.CertifiedWildCrops, AdditionalWildCrops: data.AdditionalWildCrops,
 					CertifiedHandling: data.CertifiedHandling, AdditionalHandling: data.AdditionalHandling, AddressCity: data.AddressCity, AddressState: data.AddressState,
-					AddressZip: data.AddressZip, Coordinates: farmCoordinates, County: county, Phone: data.Phone, Email: data.Email};
+					AddressZip: data.AddressZip, Coordinates: farmCoordinates, Phone: data.Phone, Email: data.Email};
 
 					points.push(point);
 				}
@@ -334,9 +332,9 @@
 			return zipsObject[zipCode];
 		}
 
-		function getCounty(zipCode) {
-			return counties[zipCode];
-		}
+		// function getCounty(zipCode) {
+		// 	return counties[zipCode];
+		// }
 
 		function countScope(allItems, scope){
 			if(scope=="crops"){
@@ -423,8 +421,7 @@
 			top5handling=[handlingArray[0][0], handlingArray[1][0], handlingArray[2][0], handlingArray[3][0], handlingArray[4][0]];
 
 		}
-
-		
+	
 
 		function plotTop5(array) {
 			d3.select("#top5svg").remove();
@@ -456,8 +453,6 @@
 				.attr("class", "topFive");
 
 		}
-
-
 
 		function showFarmsByState(farmData, stateData, states, ratioData){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
