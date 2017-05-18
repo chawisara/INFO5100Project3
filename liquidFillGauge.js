@@ -187,8 +187,8 @@ function loadLiquidFillGauge(elementId, value, config) {
     if(config.waveAnimate) animateWave();
 
     function animateWave() {
-        wave.attr('transform','translate('+waveAnimateScale(wave.attr('T'))+',0)');
-        wave.transition()
+        wave.attr('transform','translate('+waveAnimateScale(wave.attr('T'))+',0)')
+            .transition()
             .duration(config.waveAnimateTime * (1-wave.attr('T')))
             .ease('linear')
             .attr('transform','translate('+waveAnimateScale(1)+',0)')

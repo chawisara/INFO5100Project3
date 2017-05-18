@@ -58,8 +58,8 @@
 	<p>see farms certified
 	<br>by specific date</p>
 	<form onreset="showAllFarms()">
-		<input type="text" id="datepicker" onchange="dateFilter(this.value)">
-		<input type="reset" id="cleardate" value="Clear" >
+		<input type="text" id="datepicker" onchange="dateFilter(this.value)" onsubmit="return false;">
+		<input type="reset" id="cleardate" value="Clear">
 	</form>
 	</div>
 	<br>
@@ -83,7 +83,7 @@
 
 		var loadpage=true;
 
-		var zipData, farmData, stateData, topTenData, USMapData, electionData;
+		var zipData, farmData, stateData, topTenData, USMapData, electionData, ratioData;
 		var farms;
 		// var div = d3.select("#map").append("div").attr("class", "toolTip");
 		var div = d3.select("body").append("div")	
@@ -190,6 +190,7 @@
 			stateData = stateData;
 			topTenData = topTenData;
 			ElectionData = ElectionData;
+			ratioData=ratioData;
 
 			topTenData.forEach(function(d){
 				toptenFIPS.push(d.FIPS);
@@ -581,7 +582,7 @@
         	.remove();
 
         	USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
-			console.log("is function working")
+
 			var paths=svg.selectAll("path.country").data(states.features);
 			paths.enter().append("path").attr("class","country")
 			.merge(paths)
@@ -606,7 +607,6 @@
 			})
 			.on("click", clicked);
 
-			showFarmsByState(farms, stateData, states);
 			showAllFarms();
 
 		}
