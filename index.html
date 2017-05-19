@@ -240,7 +240,9 @@
 				var coordinates=[d.Longitude, d.Latitude];
 				var state={State: d.State, Coordinates: coordinates, FarmCount: 0, TopScope: "", Ratio: 0.0};
 				statecoordinates.push(state);
+				
 			});
+			console.log("state", statecoordinates);
 
 			farmData.forEach(function(data){
 				var zipCoordinates;
@@ -263,7 +265,7 @@
 				}
 
 				//crops
-				if(data.CertifiedCrops!=undefined){
+				if(data.CertifiedCrops != undefined){
 					var index=data.CertifiedCrops.indexOf(":");
 					var crops=data.CertifiedCrops.substring(index+1);
 					crops=crops.split(",");
@@ -457,9 +459,36 @@
 		function showFarmsByState(farmData, stateData, states, ratioData){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
 
-			farms=farmData;
+			farms = farmData;
 
-			var paths=svg.selectAll("path.country").data(states.features);
+
+			var max=0;
+			var count=0;
+			statecoordinates.forEach(function(state){
+				var count=0;
+				// var cropscount=0, livestockcount=0, wildcropscount=0, handlingcount=0;
+
+				farms.forEach(function(farm){
+					if(state.State==farm.AddressState){
+						count++;
+					}
+
+				});
+
+				ratioData.forEach(function(r){
+					if(state.State==r.States){
+						state.Ratio=r.OrganicRatio;
+					}
+				});
+
+
+				state.FarmCount=count;
+				// console.log("stateFarmCount", state.FarmCount);
+				if(max<count) max=count;
+				// console.log("couunt", count);
+				// return count;
+
+							var paths=svg.selectAll("path.country").data(states.features);
 			paths.enter().append("path").attr("class","country")
 			.merge(paths)
 			.attr("d", function(country){
@@ -471,9 +500,7 @@
                 div.transition()		
                 .duration(200)		
                 .style("opacity", .9);		
-            	div.html("Total number of organic farms:" + "<br/>"
-            	 // + (d.state.FarmCount)
-            	 )	
+            	div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)	
                 .style("left", (d3.event.pageX - 50) + "px")		
                 .style("top", (d3.event.pageY - 70) + "px");
                 //ADD HOVER	
@@ -488,52 +515,15 @@
 			})
 			.on("click", clicked);
 
-			var max=0;
-
-			statecoordinates.forEach(function(state){
-				var count=0;
-				// var cropscount=0, livestockcount=0, wildcropscount=0, handlingcount=0;
-
-				farms.forEach(function(farm){
-					if(state.State==farm.AddressState){
-						count++;
-					}
-					// if(farm.CertifiedCrops) cropscount++;
-					// if(farm.AdditionalCrops) cropscount++;
-					// if(farm.CertifiedLivestock) livestockcount++;
-					// if(farm.AdditionalLivestock) livestockcount++;
-					// if(farm.CertifiedWildCrops) wildcropscount++;
-					// if(farm.AdditionalWildCrops) wildcropscount++;
-					// if(farm.CertifiedHandling) handlingcount++;
-					// if(farm.AdditionalHandling) handlingcount++;
-				});
-
-				ratioData.forEach(function(r){
-					if(state.State==r.States){
-						state.Ratio=r.OrganicRatio;
-					}
-				});
-
-
-				state.FarmCount=count;
-				if(max<count) max=count;
-
-				// var maxscope=Math.max(cropscount, livestockcount, wildcropscount, handlingcount);
-				// if(maxscope==cropscount) state.TopScope="Crops";
-				// else if(maxscope==livestockcount) state.TopScope="Livestock";
-				// else if(maxscope==wildcropscount) state.TopScope="Wild Crops";
-				// else state.TopScope="Handling";
-
-				// console.log(state.TopScope);
-
 			});
+			// console.log("couunt", count);
 
-			if(loadpage){
-				showAllFarmsAnimation();
-				loadpage=false;
-			}else{
-				showAllFarms();
-			}
+				if(loadpage){
+					showAllFarmsAnimation();
+					loadpage=false;
+				}else{
+					showAllFarms();
+				}
 
 		}
 
