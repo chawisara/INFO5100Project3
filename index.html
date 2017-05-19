@@ -172,6 +172,7 @@
 
 		var toptenFIPS=[];
 		var electionResults=[];
+		var organicResults=[];
 
 		d3.queue()
 		.defer(d3.json, "us.json")
@@ -200,6 +201,11 @@
 			ElectionData.forEach(function(d){
 				var data = {FIPS: d.ComboFIPS, Dem: d.DemPercent, GOP: d.RepPercent}
 				electionResults.push(data)
+			})
+
+			ratioData.forEach(function(d){
+				var data = {FIPS: d.FIPS, States: d.States, OrganicRatio: d.OrganicRatio}
+				organicResults.push(data)
 			})
 
 			var farms=dataPoints(zipData, stateData, farmData);
@@ -237,9 +243,7 @@
 				var coordinates=[d.Longitude, d.Latitude];
 				var state={State: d.State, Coordinates: coordinates, FIPS: d.FIPS, FarmCount: 0, TopScope: "", Ratio: 0.0};
 				statecoordinates.push(state);
-				
 			});
-			console.log("state", statecoordinates);
 
 			farmData.forEach(function(data){
 				var zipCoordinates;
@@ -260,7 +264,7 @@
 				}
 
 				//crops
-				if(data.CertifiedCrops != undefined){
+				if(data.CertifiedCrops!=undefined){
 					var index=data.CertifiedCrops.indexOf(":");
 					var crops=data.CertifiedCrops.substring(index+1);
 					crops=crops.split(",");
@@ -453,7 +457,7 @@
 		function showFarmsByState(farmData, stateData, states, ratioData){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
 
-			farms = farmData;
+			farms=farmData;
 
 			var paths=svg.selectAll("path.country").data(states.features);
 			paths.enter().append("path").attr("class","country")
@@ -465,20 +469,19 @@
 				this.setAttribute("style", "stroke-width: 4px");
 				this.setAttribute("cursor", "pointer");
                 div.transition()		
-                .duration(200)		
+                .duration(200)
                 .style("opacity", .9);
 
-                //COPY THIS AND ADD state.FarmCount
+                //COPY THIS AND ADD state.State
                 statecoordinates.forEach(function(state){
                 	if(state.FIPS == d.id){
-                		div.html("Total number of organic farms:" + "<br/>" + state.State)
+                		div.html("Total number of organic farms:" + "<br/>" + state.FarmCount)
 		                .style("left", (d3.event.pageX - 50) + "px")		
 		                .style("top", (d3.event.pageY - 70) + "px");
                 	}
                 	
                 });
-            	
-                
+
 			})
 			.on("mouseout", function(d){
 				this.setAttribute("style", "stroke-width: 1px");
@@ -491,7 +494,7 @@
 			.on("click", clicked);
 
 			var max=0;
-			var count=0;
+
 			statecoordinates.forEach(function(state){
 				var count=0;
 				// var cropscount=0, livestockcount=0, wildcropscount=0, handlingcount=0;
@@ -500,7 +503,14 @@
 					if(state.State==farm.AddressState){
 						count++;
 					}
-
+					// if(farm.CertifiedCrops) cropscount++;
+					// if(farm.AdditionalCrops) cropscount++;
+					// if(farm.CertifiedLivestock) livestockcount++;
+					// if(farm.AdditionalLivestock) livestockcount++;
+					// if(farm.CertifiedWildCrops) wildcropscount++;
+					// if(farm.AdditionalWildCrops) wildcropscount++;
+					// if(farm.CertifiedHandling) handlingcount++;
+					// if(farm.AdditionalHandling) handlingcount++;
 				});
 
 				ratioData.forEach(function(r){
@@ -511,19 +521,24 @@
 
 
 				state.FarmCount=count;
-				// console.log("stateFarmCount", state.FarmCount);
 				if(max<count) max=count;
-				// console.log("couunt", count);
-				// return count;
-			});
-			// console.log("couunt", count);
 
-				if(loadpage){
-					showAllFarmsAnimation();
-					loadpage=false;
-				}else{
-					showAllFarms();
-				}
+				// var maxscope=Math.max(cropscount, livestockcount, wildcropscount, handlingcount);
+				// if(maxscope==cropscount) state.TopScope="Crops";
+				// else if(maxscope==livestockcount) state.TopScope="Livestock";
+				// else if(maxscope==wildcropscount) state.TopScope="Wild Crops";
+				// else state.TopScope="Handling";
+
+				// console.log(state.TopScope);
+
+			});
+
+			if(loadpage){
+				showAllFarmsAnimation();
+				loadpage=false;
+			}else{
+				showAllFarms();
+			}
 
 		}
 
@@ -540,17 +555,6 @@
 			.attr("d", function (county) {
 				return USpathGenerator(county);
 			})
-			.on("click", clicked)
-			// .on("mouseover", function(d){
-			// 	this.setAttribute("style", "stroke-width: 4px");
-			// 	this.setAttribute("cursor", "pointer");
-			// 	//ADD HOVER
-			// })
-			// .on("mouseout", function(d){
-			// 	this.setAttribute("style", "stroke-width: 1px");
-			// 	this.setAttribute("cursor", "default");
-			// 	//HIDE HOVER
-			// })
 			.transition().duration(10)
 			.style("fill", function(d) {
 				for (i=0; i < electionResults.length; i++){
@@ -565,10 +569,46 @@
 				
 			});
 
-			svg.selectAll("circle").remove();
+			showAllFarms();	
+
+			svg.selectAll("circle").attr("opacity", .1);
+
+			
+
+		}
+
+		function showRatioMap(states){
+
+			svg.selectAll("path.country")
+        	.remove();
+
+
+
+			var color = d3.scaleLinear().domain([0.0, 25, 50, 100, 500, 750.0]).range(["#92C8AC","#52A378","#376D50","#29513C", "#1B3628", "#15291E"]);
+			var paths=svg.selectAll("path.country").data(states.features);
+			paths.enter().append("path").attr("class","country")
+			.merge(paths)
+			.attr("d", function(country){
+				return USpathGenerator(country);
+			})
+			.transition().duration(10)
+			.style("fill", function(d) {
+				console.log(organicResults)
+				console.log(organicResults.length)
+				for (i=0; i < organicResults.length; i++) {
+					if (d.id == organicResults[i].FIPS){
+						return color(organicResults[i].OrganicRatio)
+					}
+				}
+			});
+
+			// showAllFarms();	
 
 			showAllFarms();	
 
+			svg.selectAll("circle").attr("opacity", .1);
+
+			
 		}
 
 		function showOriginalMap(states){
@@ -671,8 +711,8 @@
 				// .attr("width", 5)
 				// .attr("height", 5);
 
-				// translation=[width / 2 - x, height / 2 - y];
-				translation=[width / 2 - k*x, height / 2 - k*y];
+				translation=[width / 2 - x, height / 2 - y];
+				// translation=[width / 2 - k*x, height / 2 - k*y];
 
 			} else {
 				x = 0;
@@ -723,8 +763,8 @@
 
 			svg.transition()
 			.duration(750)
-			// .attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
-			.attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ") ")
+			.attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
+			// .attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ") ")
 			.style("stroke-width", 1.5 / k + "px");
 
 
@@ -783,8 +823,8 @@
 
 			svg.transition()
 			.duration(750)
-			// .attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
-			.attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ") ")
+			.attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
+			// .attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ") ")
 			.style("stroke-width", 1.5 / k + "px");
 
 		}
