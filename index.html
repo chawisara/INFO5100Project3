@@ -709,24 +709,28 @@
 				paths.enter().append("path").attr("class", "country")
 				.merge(paths)
 				.attr("d", function (county) {
-					return USpathGenerator(county);
+						return USpathGenerator(county);
 				})
 				.on("click", clicked)
 				.on("mouseover", function(d){
-				this.setAttribute("style", "stroke-width: 4px");
-				this.setAttribute("cursor", "pointer");
-                div.transition()		
-                .duration(200)
-                .style("opacity", .9);
-                statecoordinates.forEach(function(state){
-                	if(state.FIPS == d.id){
-                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
-		                .style("left", (d3.event.pageX - 50) + "px")		
-		                .style("top", (d3.event.pageY - 70) + "px");
-                	}
-                	
-                });
-					//ADD HOVER
+					this.setAttribute("style", "stroke-width: 4px");
+					this.setAttribute("cursor", "pointer");
+	                div.transition()		
+	                .duration(200)
+	                .style("opacity", .9);
+
+	                var names="";
+
+	                farms.forEach(function(farm){
+	                	if(farm.CountyFIPS == d.id){
+	                		// div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+			                // .style("left", (d3.event.pageX - 50) + "px")		
+			                // .style("top", (d3.event.pageY - 70) + "px");
+			                names+=farm.OperationName+" ";
+	                	}
+	                	
+	                });
+					//KENZIE: ADD HOVER HERE
 				})
 				.on("mouseout", function(d){
 					this.setAttribute("style", "stroke-width: 1px");
