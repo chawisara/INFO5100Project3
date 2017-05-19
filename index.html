@@ -210,6 +210,15 @@
 
 			var farms=dataPoints(zipData, stateData, farmData);
 
+			console.log(farmData);
+			var zipArray = [];
+			farmData.forEach(function(d) {
+				if (d.AddressZip == 95679) {
+					zipArray.push(d);
+				}
+			});
+			console.log(zipArray);
+
 			showFarmsByState(farms, stateData, states, ratioData);
 
 		});
