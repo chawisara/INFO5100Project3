@@ -5,13 +5,6 @@
 <link href="https://fonts.googleapis.com/css?family=Muli:400,800,900|Raleway:400,800|Roboto" rel="stylesheet">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="styles.css">
-<style>
-	.liquidFillGaugeText {
-		font-family: Helvetica;
-		font-weight: bold;
-	}
-
-</style>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="http://d3js.org/topojson.v2.min.js"></script>
@@ -23,21 +16,6 @@
 <script src="liquidFillGauge.js"></script>
 
 </head>
-<style>
-.tooltip {	
-    position: absolute;		
-    text-align: left;			
-    width: auto;					
-    height: auto;					
-    padding: 2px;				
-    font: 12px sans-serif;		
-    background: lightsteelblue;	
-    color: black;
-    border: 0px;		
-    border-radius: 8px;			
-    pointer-events: none;			
-}
-</style>
 <body>
 	<h1>Where Are the USDA Certified Organic Farms in the U.S.?</h1>
 	<br>
@@ -638,12 +616,14 @@
 			.on("mouseover", function(d){
 				this.setAttribute("style", "stroke-width: 4px");
 				this.setAttribute("cursor", "pointer");
+				this.setAttribute("style", "background-color: white");
 				div.transition()		
                 .duration(200)		
                 .style("opacity", .9);		
             	div.html("" + "<br/>" )	
                 .style("left", (d3.event.pageX - 50) + "px")		
-                .style("top", (d3.event.pageY - 70) + "px");
+                .style("top", (d3.event.pageY - 70) + "px")
+;
 				//ADD HOVER
 			})
 			.on("mouseout", function(d){

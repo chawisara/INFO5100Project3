@@ -56,6 +56,25 @@ path {
 	top:1px;
 }
 
+.tooltip {	
+    position: absolute;		
+    text-align: left;			
+    width: auto;					
+    height: auto;					
+    padding: 10px;				
+    font: 12px;		
+    background: #165736;	
+    color: white;
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
+.liquidFillGaugeText {
+	font-family: Helvetica;
+	font-weight: bold;
+}
+
 .topFiveText {
 	font-size: 16pt;
 }
