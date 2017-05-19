@@ -66,12 +66,12 @@
 
 		var zipData, farmData, stateData, topTenData, USMapData, electionData, ratioData, countyNameData, countyFIPSData;
 		var farms;
-		// var div = d3.select("#map").append("div").attr("class", "toolTip");
+
 		var div = d3.select("body").append("div")	
 		    .attr("class", "tooltip")				
 		    .style("opacity", 0);
 
-		
+		//reference: https://jqueryui.com/datepicker/
 		$("#datepicker").datepicker({
 			changeMonth: true,
 			changeYear: true,
@@ -209,23 +209,21 @@
 			var farms=dataPoints(zipData, stateData, farmData, countyNameData, countyFIPSData);
 
 			showFarmsByState(farms, stateData, states, ratioData);
-
-			console.log(farms);
-
 		});
 
+		var statecoordinates=[]; //contains the state name, coordinates, FIPS, total # farms, top certified scope, ratio of organic:normal farms
+		var zipsObject = {}; //links zipcodes with map coordinates
 
-		// var zips = [];
-		var statecoordinates=[];
-		var zipsObject = {};
+		//top 5 items for each scope
 		var top5crops=[];
 		var top5livestock=[];
 		var top5wildcrops=[];
 		var top5handling=[];
 
-		var countyNames={};
-		var countyFIPS={};
+		var countyNames={}; //links county names with zip code
+		var countyFIPS={}; //links county FIPS with county names
 
+		//all of the items under each scope
 		var allCrops={};
 		var allLivestock={};
 		var allWildCrops={};
@@ -233,7 +231,7 @@
 
 
 		function dataPoints(zipData, stateData, farmData, countyNameData, countyFIPSData){
-			var points = [];
+			var points = []; //array of farm objects containing all of the relevant information used to map + hover
 
 			zipData.forEach(function(d){
 				var coordinates=[d.Longitude, d.Latitude];
@@ -257,7 +255,7 @@
 			farmData.forEach(function(data){
 				var zipCoordinates;
 
-				if(data.AddressZip.indexOf("-")!=-1){
+				if(data.AddressZip.indexOf("-")!=-1){ //trim zipcodes longer than 5 digits (e.g.44417-9707)
 					data.AddressZip=data.AddressZip.substring(0, data.AddressZip.indexOf("-"));
 				}
 
@@ -275,6 +273,7 @@
 					points.push(point);
 				}
 
+				//create arrays for items under each scope
 				//crops
 				if(data.CertifiedCrops!=undefined){
 					var index=data.CertifiedCrops.indexOf(":");
@@ -353,6 +352,7 @@
 			return countyFIPS[countyName];
 		}
 
+		//count # of items/products under each scope to find the top 5
 		function countScope(allItems, scope){
 			if(scope=="crops"){
 				for(var i=0; i<allItems.length; i++){
@@ -397,6 +397,8 @@
 		}
 
 		function findTop5(){
+			//create arrays from the objects in order to sort them based on the # of times it occured in the data
+			//the more frequent, the more popular the item is
 			var cropsArray = [];
 			for (var crop in allCrops) {
 				cropsArray.push([crop, allCrops[crop]]);
@@ -405,6 +407,7 @@
 				return b[1]-a[1];
 			});
 
+			//choose the top 5 from the array
 			top5crops=[cropsArray[0][0], cropsArray[1][0], cropsArray[2][0], cropsArray[3][0], cropsArray[4][0]];
 
 			var livestockArray = [];
@@ -440,7 +443,6 @@
 		}
 
 		
-
 		function plotTop5(array) {
 			d3.select("#top5svg").remove();
 
@@ -472,7 +474,7 @@
 
 		}
 
-
+		//show the default map
 		function showFarmsByState(farmData, stateData, states, ratioData){
 			USprojection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]], states);
 
@@ -491,7 +493,7 @@
                 .duration(200)
                 .style("opacity", .9);
 
-                //COPY THIS AND ADD state.State
+                //show tooltip
                 statecoordinates.forEach(function(state){
                 	if(state.FIPS == d.id){
                 		div.html(state.State + "<br/>" + "Total number of organic farms: " + state.FarmCount)
@@ -508,15 +510,11 @@
 				div.transition()		
                 .duration(500)		
                 .style("opacity", 0);
-				//HIDE HOVER
 			})
-			.on("click", clicked);
-
-			var max=0;
+			.on("click", clicked); //clicked() = zooming function
 
 			statecoordinates.forEach(function(state){
 				var count=0;
-				// var cropscount=0, livestockcount=0, wildcropscount=0, handlingcount=0;
 
 				farms.forEach(function(farm){
 					if(state.State==farm.AddressState){
@@ -530,12 +528,12 @@
 					}
 				});
 
-
 				state.FarmCount=count;
-				if(max<count) max=count;
+
 			});
 
-			if(loadpage){
+
+			if(loadpage){ //only animate the farm distribution when the page first loads
 				showAllFarmsAnimation();
 				loadpage=false;
 			}else{
@@ -546,6 +544,8 @@
 
 
 		function showelectionData(counties){
+			var legend=d3.select("#politicalLegend");
+			legend.selectAll("svg").remove();
 
 			var colorBlue = d3.scaleLinear().domain([0.0, 0.33, 0.66, 1.0]).range(["#FFFFFF","#85C6FF","#0A8DFF","#002C52"]);
 		
@@ -582,8 +582,6 @@
 			svg.selectAll("path.country")
         	.remove();
 
-
-
 			var color = d3.scaleLinear().domain([0.0, 25, 50, 100, 500, 750.0]).range(["#92C8AC","#52A378","#376D50","#29513C", "#1B3628", "#15291E"]);
 			var paths=svg.selectAll("path.country").data(states.features);
 			paths.enter().append("path").attr("class","country")
@@ -602,8 +600,6 @@
 				}
 			});
 
-			// showAllFarms();	
-
 			showAllFarms();	
 
 			svg.selectAll("circle").attr("opacity", .1);
@@ -612,7 +608,10 @@
 			
 		}
 
+		//when clicked on reset button
 		function showOriginalMap(states){
+			var legend=d3.select("#politicalLegend");
+			legend.selectAll("svg").remove();
 			        	        	
 			svg.selectAll("circle").remove();
 			
@@ -641,12 +640,12 @@
                 	}
                 	
                 });
-				//ADD HOVER
+
 			})
 			.on("mouseout", function(d){
 				this.setAttribute("style", "stroke-width: 1px");
 				this.setAttribute("cursor", "default");
-				//HIDE HOVER
+
 			})
 			.on("click", clicked);
 
@@ -657,7 +656,6 @@
 
 
 		//code reference: https://bl.ocks.org/mbostock/2206590
-
 		function clicked(d) {
 
 			var x, y, k;
@@ -666,13 +664,14 @@
 
 			svg.selectAll("path").remove();
 
-			if (d && centered !== d) {
+			if (d && centered !== d) { //when zoomed in
 				var centroid = USpathGenerator.centroid(d);
 				x = centroid[0];
 				y = centroid[1];
 				k = 4;
 				centered = d;
 
+				//show by counties
 				var paths=svg.selectAll("path.country").data(counties.features);
 				paths.enter().append("path").attr("class", "country")
 				.merge(paths)
@@ -714,7 +713,7 @@
 
 				translation=[width / 2 - x, height / 2 - y];
 
-			} else {
+			} else { //when zoomed out
 				x = 0;
 				y = 0;
 				k = 1;
@@ -722,6 +721,7 @@
 
 				translation=[0,0];
 
+				//show by states
 				var paths=svg.selectAll("path.country").data(states.features);
 				paths.enter().append("path").attr("class","country")
 				.merge(paths)
@@ -729,29 +729,27 @@
 					return USpathGenerator(country);
 				})
 				.on("mouseover", function(d){
-				this.setAttribute("style", "stroke-width: 4px");
-				this.setAttribute("cursor", "pointer");
-                div.transition()		
-                .duration(200)
-                .style("opacity", .9);
+					this.setAttribute("style", "stroke-width: 4px");
+					this.setAttribute("cursor", "pointer");
+	                div.transition()		
+	                .duration(200)
+	                .style("opacity", .9);
 
-                statecoordinates.forEach(function(state){
-                	if(state.FIPS == d.id){
-                		div.html(state.State + "<br/>" + "Total number of organic farms: " + state.FarmCount)
-		                .style("left", (d3.event.pageX - 50) + "px")		
-		                .style("top", (d3.event.pageY - 70) + "px");
-                	}
-                	
-                });
-	                //ADD HOVER	
+	                statecoordinates.forEach(function(state){
+	                	if(state.FIPS == d.id){
+	                		div.html(state.State + "<br/>" + "Total number of organic farms: " + state.FarmCount)
+			                .style("left", (d3.event.pageX - 50) + "px")		
+			                .style("top", (d3.event.pageY - 70) + "px");
+	                	}
+	                	
+	                });
 				})
 				.on("mouseout", function(d){
 					this.setAttribute("style", "stroke-width: 1px");
 					this.setAttribute("cursor", "default");
-					div.transition()		
+					div.transition()
 	                .duration(500)		
 	                .style("opacity", 0);
-					//HIDE HOVER
 				})
 				.on("click", clicked);
 
@@ -769,9 +767,9 @@
 			.attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
 			.style("stroke-width", 1.5 / k + "px");
 
-
 		}
 
+		//called when click on "zoom out" button
 		function zoomout(){
 
 			var x, y, k;
@@ -808,7 +806,6 @@
                 	}
                 	
                 });
-                //ADD HOVER	
 			})
 			.on("mouseout", function(d){
 				this.setAttribute("style", "stroke-width: 1px");
@@ -816,7 +813,6 @@
 				div.transition()
                 .duration(500)
                 .style("opacity", 0);
-				//HIDE HOVER
 			})
 			.on("click", clicked);
 
@@ -835,8 +831,8 @@
 		}
 
 
-		d3.select("#crops")
-		.on("click", crops_clicked);
+		//scope filter buttons
+		d3.select("#crops").on("click", crops_clicked);
 		d3.select("#livestock").on("click", livestock_clicked);
 		d3.select("#wildcrops").on("click", wildcrops_clicked);
 		d3.select("#handling").on("click", handling_clicked);
@@ -934,7 +930,7 @@
 			d3.select("#top5svg").remove();
 		}
 
-
+		//called when picked a date
 		function dateFilter(inputDate){
 			if(inputDate==""){
 				showAllFarms();
@@ -973,7 +969,7 @@
 
 		}
 
-
+		//default state: plot all farms to the map
 		function showAllFarms(){
 			svg.selectAll("circle").remove();
 			svg.selectAll("text").remove();
@@ -1011,9 +1007,11 @@
 		var skipClicked=false;
 		var count=0;
 
+		//called when page first loads; plot the farms one by one
 		function showAllFarmsAnimation(){
 			svg.selectAll("circle").remove();
 
+			//skip button
 			svg.append("text")
 			.attr("id", "skip")
 			.attr("x", 650)
@@ -1028,6 +1026,7 @@
 				this.setAttribute("cursor", "pointer");
 			})
 			.on("click", function(d){
+				//stop animation and show all farms immediately
 				skipClicked=true;
 				clearTimeout(timeAnimation);
 				timeAnimation = null;
@@ -1050,7 +1049,6 @@
 				}
 			});
 		}
-
 
 		function animateFarms(farm){
 			timeAnimation=setTimeout(function(){
@@ -1084,6 +1082,7 @@
 					});
 
 					if(count<farms.length){
+						//incrementing text on the bottom left of the map
 						svg.append("text")
 						.attr("id", "year")
 						.attr("x", 50)
@@ -1117,15 +1116,7 @@
 			}, 500);
 		}
 
-		d3.selection.prototype.moveToBack = function() {
-	        return this.each(function() {
-	            var firstChild = this.parentNode.firstChild;
-	            if (firstChild) {
-	                this.parentNode.insertBefore(this, firstChild);
-	            }
-	        });
-	    };
-
+		//reference: http://bl.ocks.org/eesur/4e0a69d57d3bfc8a82c2
 	    d3.selection.prototype.moveToFront = function() {
 			return this.each(function(){
 				this.parentNode.appendChild(this);
@@ -1134,7 +1125,7 @@
 
 
 	function createLegend() {
-	    var mapLegend = d3.select("#politicalLegend").append("svg").attr("width", 1100).attr("height", 50);
+	    var mapLegend = d3.select("#politicalLegend").append("svg").attr("width", 1100).attr("height", 10);
 
 	    var legendWidth = 150,
 	        legendHeight = 10
