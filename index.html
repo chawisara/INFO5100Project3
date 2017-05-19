@@ -40,6 +40,9 @@
 	</form>
 	</div>
 	<br>
+	<div id="politicalLegend">
+	</div>
+	<br>
 	<div id="political" style="float:left; margin-left:350px;">
 	<button type="button" class="largeButton" id="zoomout" onclick="zoomout()"> Zoom Out </button>
 	<h2>Compare</h2>
@@ -206,6 +209,8 @@
 			var farms=dataPoints(zipData, stateData, farmData, countyNameData, countyFIPSData);
 
 			showFarmsByState(farms, stateData, states, ratioData);
+
+			console.log(farms);
 
 		});
 
@@ -622,6 +627,7 @@
 
 			svg.selectAll("circle").attr("opacity", .1);
 
+			createLegend();
 			
 		}
 
@@ -664,6 +670,7 @@
 			.on("click", clicked);
 
 			showAllFarms();
+
 
 		}
 
@@ -1191,65 +1198,40 @@
 			});
 		};
 
-		// function liquidChart(){
 
-		// 	svg.selectAll("path").remove();
-		// 	svg.selectAll("circle").remove();
+	function createLegend() {
+	    var mapLegend = d3.select("#politicalLegend").append("svg").attr("width", 1100).attr("height", 50);
 
-		// 	svg.append("g")
-		// 	.attr("width", 1100)
-		// 	.attr("height", 650);
+	    var legendWidth = 150,
+	        legendHeight = 10
+	        translate = 700;
 
-		// 	var g=svg.selectAll("g");
+	    //creating gradient legend
+	    //code reference https://www.visualcinnamon.com/2016/05/smooth-color-legend-d3-svg-gradient.html
+	    var defs = mapLegend.append("defs");
 
-		// 	var count=0;
+	    var linearGradient = defs.append("linearGradient")
+	        .attr("id", "linear-gradient")
+	        .attr("x1", "0%").attr("y1", "0%")
+	        .attr("x2", "100%").attr("y2", "0%");
 
-		// 	statecoordinates.forEach(function(d){
-		// 		count++;
+	    linearGradient.append("stop").attr("offset", "0%").attr("stop-color", "#92C8AC");
+	    linearGradient.append("stop").attr("offset", "100%").attr("stop-color", "#1B3628");
 
-		// 		g.append("svg")
-		// 		.attr("id", "fillgauge"+count)
-		// 		.attr("width", "20%")
-		// 		.attr("height", 250)
-		// 		.attr("dx", USprojection(d.Coordinates)[0])
-		// 		.attr("dy", USprojection(d.Coordinates)[1])
-		// 		.style("font-family","Helvetica")
-		// 		.style("font-weight", "bold")
-		// 		.style("color", "#A6BF50")
-		// 		.style("font-size", 20);
+	    mapLegend.append("rect")
+	        .attr("width", legendWidth)
+	        .attr("height", legendHeight)
+	        .attr("x", 100 + translate)
+	        .attr("y", 0)
+	        .style("fill", "url(#linear-gradient)")
+	        .style("stroke", "#165736").style("stroke-width", 0.5).style("stroke-opacity", 0.7);
 
-		// 		var config = liquidFillGaugeDefaultSettings();
+	    mapLegend.append("text").attr("x", 100 + translate).attr("y", 30)
+	    .text("less").style("fill", "white");
 
-		// 		config.circleThickness = 0.1;
-		// 		config.circleColor="#A6BF50";
-		// 		config.textColor = "#485B06";
-		// 		config.waveTextColor = "#F5FFD2";
-		// 		config.waveColor = "#A6BF50";
-		// 		config.textVertPosition = 0.5;
-		// 		config.waveAnimateTime = 1000;
-		// 		config.waveHeight = 0.05;
-		// 		config.waveAnimate = true;
-		// 		config.waveRise = false;
-		// 		config.waveHeightScaling = false;
-		// 		config.waveOffset = 0.25;
-		// 		config.textSize = 0.75;
-		// 		config.waveCount = 1;
-
-		// 		var gauge = loadLiquidFillGauge("fillgauge"+count, d.Ratio, config);
-				
-
-		// 		d3.select("#fillgauge"+count)
-		// 		.append("text")
-		// 		.attr("x", 100)
-		// 		.attr("y", 50)
-		// 		.text(d.State);
-
-		// 	});
-
-			
-			
-		//}
-
+	    mapLegend.append("text").attr("x", 220 + translate).attr("y", 30)
+	    .text("more").style("fill", "white");
+	}
 
 
 	</script>
