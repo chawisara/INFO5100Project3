@@ -5,14 +5,6 @@
 <link href="https://fonts.googleapis.com/css?family=Muli:400,800,900|Raleway:400,800|Roboto" rel="stylesheet">
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="styles.css">
-<style>
-	.liquidFillGaugeText {
-		font-family: Helvetica;
-		font-weight: bold;
-	}
-
-</style>
-
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="http://d3js.org/topojson.v2.min.js"></script>
 <script src="https://d3js.org/d3-array.v1.min.js"></script>
@@ -23,21 +15,6 @@
 <script src="liquidFillGauge.js"></script>
 
 </head>
-<style>
-.tooltip {	
-    position: absolute;		
-    text-align: left;			
-    width: auto;					
-    height: auto;					
-    padding: 2px;				
-    font: 12px sans-serif;		
-    background: lightsteelblue;	
-    color: black;
-    border: 0px;		
-    border-radius: 8px;			
-    pointer-events: none;			
-}
-</style>
 <body>
 	<h1>Where Are the USDA Certified Organic Farms in the U.S.?</h1>
 	<br>
@@ -84,7 +61,7 @@
 
 		var loadpage=true;
 
-		var zipData, farmData, stateData, topTenData, USMapData, electionData, ratioData;
+		var zipData, farmData, stateData, topTenData, USMapData, electionData, ratioData, countyNameData, countyFIPSData;
 		var farms;
 		// var div = d3.select("#map").append("div").attr("class", "toolTip");
 		var div = d3.select("body").append("div")	
@@ -170,6 +147,20 @@
 			}
 		}
 
+		var parseCountyNames = function(line){
+			return{
+				Zipcode: line["zip_code"],
+				County: line["county"]
+			}
+		}
+
+		var parseCountyFIPS = function(line){
+			return{
+				County: line["County Name"],
+				FIPS: line["FIPS"]
+			}
+		}
+
 		var toptenFIPS=[];
 		var electionResults=[];
 		var organicResults=[];
@@ -182,7 +173,9 @@
 		.defer(d3.csv, "toptenorganic.csv", parseTopTen)
 		.defer(d3.csv, "2016_US_County_Level_Presidential_Results.csv", parseElectionData)
 		.defer(d3.csv, "Total number of farms and organic farms.csv", parseNumFarms)
-		.await(function(error, USMapData, zipData, farmData, stateData, topTenData, ElectionData, ratioData){
+		.defer(d3.csv, "zip_codes_states.csv", parseCountyNames)
+		.defer(d3.csv, "US_FIPS_Codes.csv", parseCountyFIPS)
+		.await(function(error, USMapData, zipData, farmData, stateData, topTenData, ElectionData, ratioData, countyNameData, countyFIPSData){
 
 			states=topojson.feature(USMapData, USMapData.objects.states);
 			counties=topojson.feature(USMapData, USMapData.objects.counties);
@@ -193,6 +186,8 @@
 			topTenData = topTenData;
 			ElectionData = ElectionData;
 			ratioData=ratioData;
+			countyNameData=countyNameData;
+			countyFIPSData=countyFIPSData;
 
 			topTenData.forEach(function(d){
 				toptenFIPS.push(d.FIPS);
@@ -223,6 +218,9 @@
 		var top5wildcrops=[];
 		var top5handling=[];
 
+		var countyNames={};
+		var countyFIPS={};
+
 		var allCrops={};
 		var allLivestock={};
 		var allWildCrops={};
@@ -234,9 +232,15 @@
 
 			zipData.forEach(function(d){
 				var coordinates=[d.Longitude, d.Latitude];
-				// var zip={Zipcode: d.Zipcode, Coordinates: coordinates};
-				// zips.push(zip);
 				zipsObject[d.Zipcode] = coordinates;
+			});
+
+			countyNames.forEach(function(d){
+				countyNames[d.Zipcode] = d.County;
+			});
+
+			countyFIPS.forEach(function(d){
+				countyFIPS[d.County] = d.FIPS;
 			});
 			
 			stateData.forEach(function(d){
@@ -253,12 +257,15 @@
 				}
 
 				var farmCoordinates = getZipCoordinate(data.AddressZip);
+				var nameCounty=getCountyName(data.AddressZip);
+				var FIPSCounty=getCountyFIPS(nameCounty);
+
 				if(farmCoordinates!=undefined){
 					var point={CertifierName: data.CertifierName, OperationID: data.OperationID, OperationName: data.OperationName, CertificationStatus: data.CertificationStatus,
 					DateOfStatus: data.DateOfStatus, CertifiedCrops: data.CertifiedCrops, AdditionalCrops: data.AdditionalCrops, CertifiedLivestock: data.CertifiedLivestock,
 					AdditionalLivestock: data.AdditionalLivestock, CertifiedWildCrops: data.CertifiedWildCrops, AdditionalWildCrops: data.AdditionalWildCrops,
 					CertifiedHandling: data.CertifiedHandling, AdditionalHandling: data.AdditionalHandling, AddressCity: data.AddressCity, AddressState: data.AddressState,
-					AddressZip: data.AddressZip, Coordinates: farmCoordinates, Phone: data.Phone, Email: data.Email};
+					AddressZip: data.AddressZip, Coordinates: farmCoordinates, County: nameCounty, CountyFIPS: FIPSCounty, Phone: data.Phone, Email: data.Email};
 
 					points.push(point);
 				}
@@ -327,6 +334,18 @@
 			findTop5();
 
 			return points;
+		}
+
+		function getZipCoordinate(zipCode) {
+			return zipsObject[zipCode];
+		}
+
+		function getCountyName(zipCode) {
+			return countyNames[zipCode];
+		}
+
+		function getCountyFIPS(countyName) {
+			return countyFIPS[countyName];
 		}
 
 		function countScope(allItems, scope){
@@ -446,11 +465,6 @@
 				.attr("x", function(d,i) {return i * 160 + 200;})
 				.attr("class", "topFive");
 
-		}
-
-
-		function getZipCoordinate(zipCode) {
-			return zipsObject[zipCode];
 		}
 
 
