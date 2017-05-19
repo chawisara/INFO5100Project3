@@ -629,12 +629,17 @@
 			.on("mouseover", function(d){
 				this.setAttribute("style", "stroke-width: 4px");
 				this.setAttribute("cursor", "pointer");
-				div.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            	div.html("" + "<br/>" )	
-                .style("left", (d3.event.pageX - 50) + "px")		
-                .style("top", (d3.event.pageY - 70) + "px");
+                div.transition()		
+                .duration(200)
+                .style("opacity", .9);
+                statecoordinates.forEach(function(state){
+                	if(state.FIPS == d.id){
+                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+		                .style("left", (d3.event.pageX - 50) + "px")		
+		                .style("top", (d3.event.pageY - 70) + "px");
+                	}
+                	
+                });
 				//ADD HOVER
 			})
 			.on("mouseout", function(d){
@@ -694,8 +699,19 @@
 				})
 				.on("click", clicked)
 				.on("mouseover", function(d){
-					this.setAttribute("style", "stroke-width: 4px");
-					this.setAttribute("cursor", "pointer");
+				this.setAttribute("style", "stroke-width: 4px");
+				this.setAttribute("cursor", "pointer");
+                div.transition()		
+                .duration(200)
+                .style("opacity", .9);
+                statecoordinates.forEach(function(state){
+                	if(state.FIPS == d.id){
+                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+		                .style("left", (d3.event.pageX - 50) + "px")		
+		                .style("top", (d3.event.pageY - 70) + "px");
+                	}
+                	
+                });
 					//ADD HOVER
 				})
 				.on("mouseout", function(d){
@@ -729,16 +745,20 @@
 					return USpathGenerator(country);
 				})
 				.on("mouseover", function(d){
-					this.setAttribute("style", "stroke-width: 4px");
-					this.setAttribute("cursor", "pointer");
-	                div.transition()		
-	                .duration(200)		
-	                .style("opacity", .9);		
-	            	div.html("Total number of organic farms:" + "<br/>"
-	            	 // + (d.state.FarmCount)
-	            	 )	
-	                .style("left", (d3.event.pageX - 50) + "px")		
-	                .style("top", (d3.event.pageY - 70) + "px");
+				this.setAttribute("style", "stroke-width: 4px");
+				this.setAttribute("cursor", "pointer");
+                div.transition()		
+                .duration(200)
+                .style("opacity", .9);
+
+                statecoordinates.forEach(function(state){
+                	if(state.FIPS == d.id){
+                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+		                .style("left", (d3.event.pageX - 50) + "px")		
+		                .style("top", (d3.event.pageY - 70) + "px");
+                	}
+                	
+                });
 	                //ADD HOVER	
 				})
 				.on("mouseout", function(d){
@@ -795,13 +815,17 @@
 				this.setAttribute("style", "stroke-width: 4px");
 				this.setAttribute("cursor", "pointer");
                 div.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            	div.html("Total number of organic farms:" + "<br/>"
-            	 // + (d.state.FarmCount)
-            	 )	
-                .style("left", (d3.event.pageX - 50) + "px")		
-                .style("top", (d3.event.pageY - 70) + "px");
+                .duration(200)
+                .style("opacity", .9);
+
+                statecoordinates.forEach(function(state){
+                	if(state.FIPS == d.id){
+                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+		                .style("left", (d3.event.pageX - 50) + "px")		
+		                .style("top", (d3.event.pageY - 70) + "px");
+                	}
+                	
+                });
                 //ADD HOVER	
 			})
 			.on("mouseout", function(d){
