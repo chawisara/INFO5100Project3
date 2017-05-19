@@ -235,7 +235,7 @@
 			
 			stateData.forEach(function(d){
 				var coordinates=[d.Longitude, d.Latitude];
-				var state={State: d.State, Coordinates: coordinates, FarmCount: 0, TopScope: "", Ratio: 0.0};
+				var state={State: d.State, Coordinates: coordinates, FIPS: d.FIPS, FarmCount: 0, TopScope: "", Ratio: 0.0};
 				statecoordinates.push(state);
 				
 			});
@@ -466,12 +466,19 @@
 				this.setAttribute("cursor", "pointer");
                 div.transition()		
                 .duration(200)		
-                .style("opacity", .9);		
-            	div.html("Total number of organic farms:" + "<br/>" + d.states.State
-            	 )	
-                .style("left", (d3.event.pageX - 50) + "px")		
-                .style("top", (d3.event.pageY - 70) + "px");
-                //ADD HOVER	
+                .style("opacity", .9);
+
+                //COPY THIS AND ADD state.FarmCount
+                statecoordinates.forEach(function(state){
+                	if(state.FIPS == d.id){
+                		div.html("Total number of organic farms:" + "<br/>" + state.State)
+		                .style("left", (d3.event.pageX - 50) + "px")		
+		                .style("top", (d3.event.pageY - 70) + "px");
+                	}
+                	
+                });
+            	
+                
 			})
 			.on("mouseout", function(d){
 				this.setAttribute("style", "stroke-width: 1px");
