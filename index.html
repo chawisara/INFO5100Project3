@@ -489,7 +489,7 @@
                 //COPY THIS AND ADD state.State
                 statecoordinates.forEach(function(state){
                 	if(state.FIPS == d.id){
-                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+                		div.html(state.State + "<br/>" + "Total number of organic farms: " + state.FarmCount)
 		                .style("left", (d3.event.pageX - 50) + "px")		
 		                .style("top", (d3.event.pageY - 70) + "px");
                 	}
@@ -648,7 +648,7 @@
                 .style("opacity", .9);
                 statecoordinates.forEach(function(state){
                 	if(state.FIPS == d.id){
-                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+                		div.html(state.State + "<br/>" + "Total number of organic farms: " + state.FarmCount)
 		                .style("left", (d3.event.pageX - 50) + "px")		
 		                .style("top", (d3.event.pageY - 70) + "px");
                 	}
@@ -720,22 +720,23 @@
 	                .style("opacity", .9);
 
 	                var names="";
+	                var countFarms=0;
 
 	                farms.forEach(function(farm){
 	                	if(farm.CountyFIPS == d.id){
-	                		// div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
-			                // .style("left", (d3.event.pageX - 50) + "px")		
-			                // .style("top", (d3.event.pageY - 70) + "px");
-			                names+=farm.OperationName+" ";
+			                names+=farm.OperationName+"<br>";
+			                countFarms++;
 	                	}
 	                	
 	                });
-					//KENZIE: ADD HOVER HERE
+					
+					div.html(names + "<br/>" + "Total number of organic farms: " + countFarms)
+	                .style("left", (d3.event.pageX - 50) + "px")		
+	                .style("top", (d3.event.pageY - 70) + "px");
 				})
 				.on("mouseout", function(d){
 					this.setAttribute("style", "stroke-width: 1px");
 					this.setAttribute("cursor", "default");
-					//HIDE HOVER
 				});
 
 				svg.selectAll("circle")
@@ -745,8 +746,8 @@
 				// .attr("width", 5)
 				// .attr("height", 5);
 
-				translation=[width / 2 - x, height / 2 - y];
-				// translation=[width / 2 - k*x, height / 2 - k*y];
+				// translation=[width / 2 - x, height / 2 - y];
+				translation=[width / 2 - k*x, height / 2 - k*y];
 
 			} else {
 				x = 0;
@@ -771,7 +772,7 @@
 
                 statecoordinates.forEach(function(state){
                 	if(state.FIPS == d.id){
-                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+                		div.html(state.State + "<br/>" + "Total number of organic farms: " + state.FarmCount)
 		                .style("left", (d3.event.pageX - 50) + "px")		
 		                .style("top", (d3.event.pageY - 70) + "px");
                 	}
@@ -801,8 +802,8 @@
 
 			svg.transition()
 			.duration(750)
-			.attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
-			// .attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ") ")
+			// .attr("transform", "scale(" + k + ") translate(0,0) translate(" + translation + ")")
+			.attr("transform", "translate(0,0) translate(" + translation + ") scale(" + k + ") ")
 			.style("stroke-width", 1.5 / k + "px");
 
 
@@ -838,7 +839,7 @@
 
                 statecoordinates.forEach(function(state){
                 	if(state.FIPS == d.id){
-                		div.html(state.State + "<br/>" + "Total number of organic farms:" + "<br/>" + state.FarmCount)
+                		div.html(state.State + "<br/>" + "Total number of organic farms: " + state.FarmCount)
 		                .style("left", (d3.event.pageX - 50) + "px")		
 		                .style("top", (d3.event.pageY - 70) + "px");
                 	}
