@@ -203,7 +203,7 @@
 				organicResults.push(data)
 			})
 
-			var farms=dataPoints(zipData, stateData, farmData);
+			var farms=dataPoints(zipData, stateData, farmData, countyNameData, countyFIPSData);
 
 			showFarmsByState(farms, stateData, states, ratioData);
 
@@ -227,7 +227,7 @@
 		var allHandling={};
 
 
-		function dataPoints(zipData, stateData, farmData){
+		function dataPoints(zipData, stateData, farmData, countyNameData, countyFIPSData){
 			var points = [];
 
 			zipData.forEach(function(d){
@@ -235,11 +235,11 @@
 				zipsObject[d.Zipcode] = coordinates;
 			});
 
-			countyNames.forEach(function(d){
+			countyNameData.forEach(function(d){
 				countyNames[d.Zipcode] = d.County;
 			});
 
-			countyFIPS.forEach(function(d){
+			countyFIPSData.forEach(function(d){
 				countyFIPS[d.County] = d.FIPS;
 			});
 			
